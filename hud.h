@@ -207,11 +207,6 @@ typedef struct hud {
 	// whether or not a white flag is being waved
 	int globalWhite;
 
-	// whether or not a white flag is being waved in the appropriate sector
-	int white1;
-	int white2;
-	int white3;
-
 	// whether or not a green flag is being waved
 	int globalGreen;
 

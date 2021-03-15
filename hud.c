@@ -147,8 +147,7 @@ static cJSON* createPitstop(HUD* curr, HUD* prev) {
  * drivingTime, drivingTime.totalRemaining, drivingTime.stintRemaining, rainTyres,
  * fuel, fuel.used, fuel.rate,
  * flag, flag.current, flag.yellow, flag.yellow.global, flag.yellow.sector1,
- * flag.yellow.sector2, flag.yellow.sector3, flag.white, flag.white.global, flag.white.sector1,
- * flag.white.sector2, flag.white.sector3, flag.green, flag.chequered, flag.red.
+ * flag.yellow.sector2, flag.yellow.sector3, flag.white, flag.green, flag.chequered, flag.red.
  *
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
@@ -234,6 +233,7 @@ static cJSON* createStatus(HUD* curr, HUD* prev) {
 	BOOL_2_OBJ(flag, "green", prev, prev->globalGreen, curr->globalGreen);
 	BOOL_2_OBJ(flag, "chequered", prev, prev->chequered, curr->chequered);
 	BOOL_2_OBJ(flag, "red", prev, prev->globalRed, curr->globalRed);
+	BOOL_2_OBJ(flag, "white", prev, prev->globalWhite, curr->globalWhite);
 
 	cJSON* yellow = cJSON_CreateObject();
 
@@ -245,17 +245,6 @@ static cJSON* createStatus(HUD* curr, HUD* prev) {
 	BOOL_2_OBJ(yellow, "sector1", prev, prev->yellow1, curr->yellow1);
 	BOOL_2_OBJ(yellow, "sector2", prev, prev->yellow2, curr->yellow2);
 	BOOL_2_OBJ(yellow, "sector3", prev, prev->yellow3, curr->yellow3);
-
-	cJSON* white = cJSON_CreateObject();
-
-	if (!white) {
-		RET_NULL(obj);
-	}
-
-	cJSON_AddItemToObject(obj, "white", white);
-	BOOL_2_OBJ(white, "sector1", prev, prev->white1, curr->white1);
-	BOOL_2_OBJ(white, "sector2", prev, prev->white2, curr->white2);
-	BOOL_2_OBJ(white, "sector3", prev, prev->white3, curr->white3);
 
 	return obj;
 }
