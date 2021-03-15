@@ -2,6 +2,7 @@
 #define HUD_H
 
 #include "enums.h"
+#include "cJSON.h"
 
 /**
  * HUD elements. Updated once per frame.
@@ -125,7 +126,7 @@ typedef struct hud {
 	int fuelPerLap;
 
 	// whether or not the rain light is on
-	int rainLights;
+	int rainLight;
 
 	// whether or not the headlights are being flashed
 	int flashingLights;
@@ -236,5 +237,7 @@ typedef struct hud {
 	RainIntensity rainIntensity10;
 	RainIntensity rainIntensity30;
 } HUD;
+
+cJSON* hudToJSON(HUD*, HUD*);
 
 #endif
