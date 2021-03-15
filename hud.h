@@ -1,6 +1,10 @@
 #ifndef HUD_H
 #define HUD_H
 
+#include <stdlib.h>
+#include <wchar.h>
+
+#include "auxiliary.h"
 #include "enums.h"
 #include "cJSON.h"
 
@@ -132,7 +136,7 @@ typedef struct hud {
 	int flashingLights;
 
 	// headlight level (driving, on, endurance)
-	int lightsStage;
+	int lights;
 
 	// exhaust temperature
 	float exhaustTemperature;
@@ -144,7 +148,7 @@ typedef struct hud {
 	int totalTimeLeft;
 
 	// current driver's stint time remaining in milliseconds
-	int DriverStintTimeLeft;
+	int stintTimeLeft;
 
 	// whether or not wet weather tyres are being used
 	int rainTyres;
