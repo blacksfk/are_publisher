@@ -24,14 +24,14 @@ static cJSON* createLaptimes(const HUD* curr, const HUD* prev) {
 		RET_NULL(obj);
 	}
 
-	NUM_2_OBJ(obj, "last", prev, prev->lastTime, curr->lastTime);
-	NUM_2_OBJ(obj, "best", prev, prev->bestTime, curr->bestTime);
-	NUM_2_OBJ(obj, "delta", prev, prev->delta, curr->delta);
-	NUM_2_OBJ(obj, "estimated", prev, prev->estimatedLapTime, curr->estimatedLapTime);
-	NUM_2_OBJ(obj, "lastSplit", prev, prev->lastSplit, curr->lastSplit);
+	NUM_2_OBJ_CMP(obj, "last", prev, prev->lastTime, curr->lastTime);
+	NUM_2_OBJ_CMP(obj, "best", prev, prev->bestTime, curr->bestTime);
+	NUM_2_OBJ_CMP(obj, "delta", prev, prev->delta, curr->delta);
+	NUM_2_OBJ_CMP(obj, "estimated", prev, prev->estimatedLapTime, curr->estimatedLapTime);
+	NUM_2_OBJ_CMP(obj, "lastSplit", prev, prev->lastSplit, curr->lastSplit);
 
-	BOOL_2_OBJ(obj, "isDeltaPositive", prev, prev->isDeltaPositive, curr->isDeltaPositive);
-	BOOL_2_OBJ(obj, "isValidLap", prev, prev->isValidLap, curr->isValidLap);
+	BOOL_2_OBJ_CMP(obj, "isDeltaPositive", prev, prev->isDeltaPositive, curr->isDeltaPositive);
+	BOOL_2_OBJ_CMP(obj, "isValidLap", prev, prev->isValidLap, curr->isValidLap);
 
 	return obj;
 }
@@ -50,17 +50,17 @@ static cJSON* createElectronics(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ(obj, "tc", prev, prev->tc, curr->tc);
-	NUM_2_OBJ(obj, "tcCut", prev, prev->tcCut, curr->tcCut);
-	NUM_2_OBJ(obj, "engineMap", prev, prev->engineMap, curr->engineMap);
-	NUM_2_OBJ(obj, "abs", prev, prev->abs, curr->abs);
-	NUM_2_OBJ(obj, "rainLight", prev, prev->rainLight, curr->rainLight);
-	NUM_2_OBJ(obj, "flashingLights", prev, prev->flashingLights, curr->flashingLights);
-	NUM_2_OBJ(obj, "lights", prev, prev->lights, curr->lights);
-	NUM_2_OBJ(obj, "wiperLevel", prev, prev->wiperLevel, curr->wiperLevel);
+	NUM_2_OBJ_CMP(obj, "tc", prev, prev->tc, curr->tc);
+	NUM_2_OBJ_CMP(obj, "tcCut", prev, prev->tcCut, curr->tcCut);
+	NUM_2_OBJ_CMP(obj, "engineMap", prev, prev->engineMap, curr->engineMap);
+	NUM_2_OBJ_CMP(obj, "abs", prev, prev->abs, curr->abs);
+	NUM_2_OBJ_CMP(obj, "rainLight", prev, prev->rainLight, curr->rainLight);
+	NUM_2_OBJ_CMP(obj, "flashingLights", prev, prev->flashingLights, curr->flashingLights);
+	NUM_2_OBJ_CMP(obj, "lights", prev, prev->lights, curr->lights);
+	NUM_2_OBJ_CMP(obj, "wiperLevel", prev, prev->wiperLevel, curr->wiperLevel);
 
-	BOOL_2_OBJ(obj, "leftIndicator", prev, prev->leftIndicator, curr->leftIndicator);
-	BOOL_2_OBJ(obj, "rightIndicator", prev, prev->rightIndicator, curr->rightIndicator);
+	BOOL_2_OBJ_CMP(obj, "leftIndicator", prev, prev->leftIndicator, curr->leftIndicator);
+	BOOL_2_OBJ_CMP(obj, "rightIndicator", prev, prev->rightIndicator, curr->rightIndicator);
 
 	return obj;
 }
@@ -78,10 +78,10 @@ static cJSON* createSession(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ(obj, "type", prev, prev->session, curr->session);
-	NUM_2_OBJ(obj, "sessionTimeLeft", prev, prev->sessionTimeLeft, curr->sessionTimeLeft);
-	NUM_2_OBJ(obj, "activeCars", prev, prev->activeCars, curr->activeCars);
-	NUM_2_OBJ(obj, "clock", prev, prev->clock, curr->clock);
+	NUM_2_OBJ_CMP(obj, "type", prev, prev->session, curr->session);
+	NUM_2_OBJ_CMP(obj, "sessionTimeLeft", prev, prev->sessionTimeLeft, curr->sessionTimeLeft);
+	NUM_2_OBJ_CMP(obj, "activeCars", prev, prev->activeCars, curr->activeCars);
+	NUM_2_OBJ_CMP(obj, "clock", prev, prev->clock, curr->clock);
 
 	return obj;
 }
@@ -99,10 +99,10 @@ static cJSON* createConditions(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ(obj, "surfaceGrip", prev, prev->surfaceGrip, curr->surfaceGrip);
-	NUM_2_OBJ(obj, "windSpeed", prev, prev->windSpeed, curr->windSpeed);
-	NUM_2_OBJ(obj, "windDirection", prev, prev->windDirection, curr->windDirection);
-	NUM_2_OBJ(obj, "track", prev, prev->trackGrip, curr->trackGrip);
+	NUM_2_OBJ_CMP(obj, "surfaceGrip", prev, prev->surfaceGrip, curr->surfaceGrip);
+	NUM_2_OBJ_CMP(obj, "windSpeed", prev, prev->windSpeed, curr->windSpeed);
+	NUM_2_OBJ_CMP(obj, "windDirection", prev, prev->windDirection, curr->windDirection);
+	NUM_2_OBJ_CMP(obj, "track", prev, prev->trackGrip, curr->trackGrip);
 
 	cJSON* rain = cJSON_CreateObject();
 
@@ -110,9 +110,9 @@ static cJSON* createConditions(const HUD* curr, const HUD* prev) {
 		RET_NULL(obj);
 	}
 
-	NUM_2_OBJ(rain, "current", prev, prev->rainIntensityCurr, curr->rainIntensityCurr);
-	NUM_2_OBJ(rain, "in10", prev, prev->rainIntensity10, curr->rainIntensity10);
-	NUM_2_OBJ(rain, "in30", prev, prev->rainIntensity30, curr->rainIntensity30);
+	NUM_2_OBJ_CMP(rain, "current", prev, prev->rainIntensityCurr, curr->rainIntensityCurr);
+	NUM_2_OBJ_CMP(rain, "in10", prev, prev->rainIntensity10, curr->rainIntensity10);
+	NUM_2_OBJ_CMP(rain, "in30", prev, prev->rainIntensity30, curr->rainIntensity30);
 
 	cJSON_AddItemToObject(obj, "rain", rain);
 
@@ -132,15 +132,15 @@ static cJSON* createPitstop(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ(obj, "tyreSet", prev, prev->pitStopTyreSet, curr->pitStopTyreSet);
-	NUM_2_OBJ(obj, "fuel", prev, prev->pitStopFuel, curr->pitStopFuel);
+	NUM_2_OBJ_CMP(obj, "tyreSet", prev, prev->pitStopTyreSet, curr->pitStopTyreSet);
+	NUM_2_OBJ_CMP(obj, "fuel", prev, prev->pitStopFuel, curr->pitStopFuel);
 
 	cJSON* pressure = cJSON_CreateObject();
 
-	NUM_2_OBJ(pressure, "fl", prev, prev->pitStopFL, curr->pitStopFL);
-	NUM_2_OBJ(pressure, "fr", prev, prev->pitStopFR, curr->pitStopFR);
-	NUM_2_OBJ(pressure, "rl", prev, prev->pitStopRL, curr->pitStopRL);
-	NUM_2_OBJ(pressure, "rr", prev, prev->pitStopRR, curr->pitStopRR);
+	NUM_2_OBJ_CMP(pressure, "fl", prev, prev->pitStopFL, curr->pitStopFL);
+	NUM_2_OBJ_CMP(pressure, "fr", prev, prev->pitStopFR, curr->pitStopFR);
+	NUM_2_OBJ_CMP(pressure, "rl", prev, prev->pitStopRL, curr->pitStopRL);
+	NUM_2_OBJ_CMP(pressure, "rr", prev, prev->pitStopRR, curr->pitStopRR);
 
 	cJSON_AddItemToObject(obj, "pressure", pressure);
 
@@ -160,8 +160,8 @@ static cJSON* createPenalty(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ(obj, "type", prev, prev->penalty, curr->penalty);
-	NUM_2_OBJ(obj, "duration", prev, prev->penaltyTime, curr->penaltyTime);
+	NUM_2_OBJ_CMP(obj, "type", prev, prev->penalty, curr->penalty);
+	NUM_2_OBJ_CMP(obj, "duration", prev, prev->penaltyTime, curr->penaltyTime);
 
 	return obj;
 }
@@ -179,8 +179,8 @@ static cJSON* createDrivingTime(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ(obj, "totalRemaining", prev, prev->totalTimeLeft, curr->totalTimeLeft);
-	NUM_2_OBJ(obj, "stintRemaining", prev, prev->stintTimeLeft, curr->stintTimeLeft);
+	NUM_2_OBJ_CMP(obj, "totalRemaining", prev, prev->totalTimeLeft, curr->totalTimeLeft);
+	NUM_2_OBJ_CMP(obj, "stintRemaining", prev, prev->stintTimeLeft, curr->stintTimeLeft);
 
 	return obj;
 }
@@ -198,8 +198,8 @@ static cJSON* createFuel(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ(obj, "used", prev, prev->fuelUsed, curr->fuelUsed);
-	NUM_2_OBJ(obj, "rate", prev, prev->fuelPerLap, curr->fuelPerLap);
+	NUM_2_OBJ_CMP(obj, "used", prev, prev->fuelUsed, curr->fuelUsed);
+	NUM_2_OBJ_CMP(obj, "rate", prev, prev->fuelPerLap, curr->fuelPerLap);
 
 	return obj;
 }
@@ -211,10 +211,10 @@ static cJSON* createYellow(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	BOOL_2_OBJ(obj, "global", prev, prev->globalYellow, curr->globalYellow);
-	BOOL_2_OBJ(obj, "sector1", prev, prev->yellow1, curr->yellow1);
-	BOOL_2_OBJ(obj, "sector2", prev, prev->yellow2, curr->yellow2);
-	BOOL_2_OBJ(obj, "sector3", prev, prev->yellow3, curr->yellow3);
+	BOOL_2_OBJ_CMP(obj, "global", prev, prev->globalYellow, curr->globalYellow);
+	BOOL_2_OBJ_CMP(obj, "sector1", prev, prev->yellow1, curr->yellow1);
+	BOOL_2_OBJ_CMP(obj, "sector2", prev, prev->yellow2, curr->yellow2);
+	BOOL_2_OBJ_CMP(obj, "sector3", prev, prev->yellow3, curr->yellow3);
 
 	return obj;
 }
@@ -233,11 +233,11 @@ static cJSON* createFlag(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ(obj, "current", prev, prev->flag, curr->flag);
-	BOOL_2_OBJ(obj, "green", prev, prev->globalGreen, curr->globalGreen);
-	BOOL_2_OBJ(obj, "chequered", prev, prev->chequered, curr->chequered);
-	BOOL_2_OBJ(obj, "red", prev, prev->globalRed, curr->globalRed);
-	BOOL_2_OBJ(obj, "white", prev, prev->globalWhite, curr->globalWhite);
+	NUM_2_OBJ_CMP(obj, "current", prev, prev->flag, curr->flag);
+	BOOL_2_OBJ_CMP(obj, "green", prev, prev->globalGreen, curr->globalGreen);
+	BOOL_2_OBJ_CMP(obj, "chequered", prev, prev->chequered, curr->chequered);
+	BOOL_2_OBJ_CMP(obj, "red", prev, prev->globalRed, curr->globalRed);
+	BOOL_2_OBJ_CMP(obj, "white", prev, prev->globalWhite, curr->globalWhite);
 
 	cJSON* yellow = createYellow(curr, prev);
 
@@ -294,15 +294,15 @@ cJSON* hudToJSON(const HUD* curr, const HUD* prev) {
 		}
 	}
 
-	NUM_2_OBJ(obj, "position", prev, prev->position, curr->position);
-	NUM_2_OBJ(obj, "distanceTraveled", prev, prev->distanceTraveled, curr->distanceTraveled);
-	NUM_2_OBJ(obj, "gameStatus", prev, prev->status, curr->status);
-	NUM_2_OBJ(obj, "laps", prev, prev->completedLaps, curr->completedLaps);
+	NUM_2_OBJ_CMP(obj, "position", prev, prev->position, curr->position);
+	NUM_2_OBJ_CMP(obj, "distanceTraveled", prev, prev->distanceTraveled, curr->distanceTraveled);
+	NUM_2_OBJ_CMP(obj, "gameStatus", prev, prev->status, curr->status);
+	NUM_2_OBJ_CMP(obj, "laps", prev, prev->completedLaps, curr->completedLaps);
 
-	BOOL_2_OBJ(obj, "isBoxed", prev, prev->isBoxed, curr->isBoxed);
-	BOOL_2_OBJ(obj, "isInPitLane", prev, prev->isInPitLane, curr->isInPitLane);
-	BOOL_2_OBJ(obj, "mandatoryPitDone", prev, prev->mandatoryPitDone, curr->mandatoryPitDone);
-	BOOL_2_OBJ(obj, "rainTyres", prev, prev->rainTyres, curr->rainTyres);
+	BOOL_2_OBJ_CMP(obj, "isBoxed", prev, prev->isBoxed, curr->isBoxed);
+	BOOL_2_OBJ_CMP(obj, "isInPitLane", prev, prev->isInPitLane, curr->isInPitLane);
+	BOOL_2_OBJ_CMP(obj, "mandatoryPitDone", prev, prev->mandatoryPitDone, curr->mandatoryPitDone);
+	BOOL_2_OBJ_CMP(obj, "rainTyres", prev, prev->rainTyres, curr->rainTyres);
 
 	// add sub-objects
 	for (int i = 0; i < HUD_ITEM_COUNT; i++) {
