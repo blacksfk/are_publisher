@@ -1,6 +1,8 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
+#include "auxiliary.h"
+
 /**
  * Physics information. Updated once per frame. Player car only.
  */
@@ -9,7 +11,7 @@ typedef struct physics {
 	int packetId;
 
 	// accelerator input (range: 0 to 1.0)
-	float gas;
+	float accelerator;
 
 	// brake input (range: 0 to 1.0)
 	float brake;
@@ -26,7 +28,7 @@ typedef struct physics {
 	// steering angle (range: -1.0 to 1.0)
 	float steeringAngle;
 
-	// current speed
+	// current speed (in km/h)
 	float speed;
 
 	// velocity in terms of global co-ordinates
@@ -35,7 +37,7 @@ typedef struct physics {
 	// accleration in terms of global co-ordiantes
 	float accelerationVector[3];
 
-	// slice for each tyre (FL, FR, RL, RR)
+	// slip for each tyre (FL, FR, RL, RR)
 	float wheelSlip[4];
 
 	// not used in ACC
@@ -49,12 +51,10 @@ typedef struct physics {
 
 	// not used in ACC
 	float tyreWear[4];
-
-	// not used in ACC
 	float tyreDirtyLevel[4];
 
 	// tyre core temperature (FL, FR, RL, RR)
-	float tyreCoreTemperature[4];
+	float tyreCoreTemp[4];
 
 	// not used in ACC
 	float camberRAD[4];
@@ -69,7 +69,7 @@ typedef struct physics {
 	float tc;
 
 	// yaw angle
-	float heading;
+	float yaw;
 
 	// pitch angle
 	float pitch;
@@ -94,8 +94,6 @@ typedef struct physics {
 
 	// not used in ACC
 	float kersCharge;
-
-	// not used in ACC
 	float kersInput;
 
 	// whether or not automatic transmission is being used
@@ -109,8 +107,6 @@ typedef struct physics {
 
 	// not used in ACC
 	float ballast;
-
-	// not used in ACC
 	float airDensity;
 
 	// air temperature
@@ -168,7 +164,7 @@ typedef struct physics {
 	// not used in ACC
 	int P2PActivations;
 	int P2PStatus;
-	int currentMaxRpm;
+	float currentMaxRpm;
 	float mz[4];
 	float fx[4];
 	float fy[4];
@@ -208,7 +204,7 @@ typedef struct physics {
 	int starterMotorOn;
 
 	// whether or not the engine is running
-	int isEngineRunning;
+	int engineRunning;
 
 	// force feedback signals
 	float kerbVibration;
@@ -216,5 +212,7 @@ typedef struct physics {
 	float forceVibration;
 	float absVibration;
 } Physics;
+
+cJSON* physicsToJSON(const Physics*, const Physics*);
 
 #endif
