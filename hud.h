@@ -123,7 +123,7 @@ typedef struct hud {
 	int abs;
 
 	// litres of fuel being consumed per lap
-	int fuelPerLap;
+	float fuelPerLap;
 
 	// whether or not the rain light is on
 	int rainLight;
