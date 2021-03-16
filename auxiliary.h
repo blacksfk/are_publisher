@@ -30,6 +30,6 @@
 // epitome of laziness; request more than enough memory for the string conversion
 #define MB_STR_LEN 256
 
-cJSON* addWstrToObject(cJSON*, char*, wchar_t*);
+cJSON* addWstrToObject(cJSON*, char*, const wchar_t*);
 
 #endif

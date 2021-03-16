@@ -8,7 +8,7 @@
  * @param  wstr The string to convert
  * @return      Value of cJSON_AddStringToObject()
  */
-cJSON* addWstrToObject(cJSON* obj, char* key, wchar_t* wstr) {
+cJSON* addWstrToObject(cJSON* obj, char* key, const wchar_t* wstr) {
 	char mbstr[MB_STR_LEN + 1];
 	size_t len = sizeof(mbstr);
 
