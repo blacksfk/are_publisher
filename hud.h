@@ -1,12 +1,8 @@
 #ifndef HUD_H
 #define HUD_H
 
-#include <stdlib.h>
-#include <wchar.h>
-
 #include "auxiliary.h"
 #include "enums.h"
-#include "cJSON.h"
 
 /**
  * HUD elements. Updated once per frame.
