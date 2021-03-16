@@ -1,6 +1,8 @@
 #ifndef PROPERTIES_H
 #define PROPERTIES_H
 
+#include "auxiliary.h"
+
 /**
  * Unchanging data that is only set upon server join.
  */
@@ -12,22 +14,22 @@ typedef struct properties {
 	wchar_t accVer[15];
 
 	// no. of sessions for the weekend
-	int numSessions;
+	int sessions;
 
 	// no. of cars
-	int numCars;
+	int cars;
 
-	// car model (TODO: create enum)
+	// car model
 	wchar_t carModel[33];
 
 	// track name
 	wchar_t track[33];
 
 	// driver's first name
-	wchar_t firstName[33];
+	wchar_t firstname[33];
 
 	// driver's last name
-	wchar_t lastName[33];
+	wchar_t surname[33];
 
 	// driver's nickname
 	wchar_t nickname[33];
@@ -54,10 +56,10 @@ typedef struct properties {
 
 	// weekend settings, consumption rates, and driver aids
 	int penaltiesEnabled;
-	float aidFuelRate;
-	float aidTyreRate;
-	float aidMechanicalDamage;
-	float aidAllowTyreBlankets;
+	float fuelRate;
+	float tyreRate;
+	float damageRate;
+	float allowTyreBlankets;
 	float aidStability;
 	int aidAutoClutch;
 	int aidAutoBlip;
@@ -88,5 +90,7 @@ typedef struct properties {
 	wchar_t dryTyreName[33];
 	wchar_t wetTyreName[33];
 } Properties;
+
+cJSON* propertiesToJSON(const Properties*);
 
 #endif
