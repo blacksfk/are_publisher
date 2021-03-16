@@ -1,6 +1,11 @@
 #ifndef AUXILIARY_H
 #define AUXILIARY_H
 
+#include <stdlib.h>
+#include <wchar.h>
+
+#include "cJSON.h"
+
 #define RET_NULL(x) {\
 	cJSON_Delete(x);\
 	return NULL;\
@@ -24,5 +29,7 @@
 
 // epitome of laziness; request more than enough memory for the string conversion
 #define MB_STR_LEN 256
+
+cJSON* addWstrToObject(cJSON*, char*, wchar_t*);
 
 #endif
