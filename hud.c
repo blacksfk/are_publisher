@@ -1,12 +1,18 @@
 #include "hud.h"
 
+// struct grouping together the json key and the function that creates the json object.
+struct item {
+	char* key;
+	cJSON* (*create)(const HUD*, const HUD*);
+};
+
 /**
  * last, best, current, delta, estimated, lastSplit, isDeltaPositive, isValidLap.
  *
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
  */
-static cJSON* createLaptimes(HUD* curr, HUD* prev) {
+static cJSON* createLaptimes(const HUD* curr, const HUD* prev) {
 	cJSON* obj = cJSON_CreateObject();
 
 	if (!obj) {
@@ -37,7 +43,7 @@ static cJSON* createLaptimes(HUD* curr, HUD* prev) {
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
  */
-static cJSON* createElectronics(HUD* curr, HUD* prev) {
+static cJSON* createElectronics(const HUD* curr, const HUD* prev) {
 	cJSON* obj = cJSON_CreateObject();
 
 	if (!obj) {
@@ -65,7 +71,7 @@ static cJSON* createElectronics(HUD* curr, HUD* prev) {
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
  */
-static cJSON* createSession(HUD* curr, HUD* prev) {
+static cJSON* createSession(const HUD* curr, const HUD* prev) {
 	cJSON* obj = cJSON_CreateObject();
 
 	if (!obj) {
@@ -86,7 +92,7 @@ static cJSON* createSession(HUD* curr, HUD* prev) {
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
  */
-static cJSON* createConditions(HUD* curr, HUD* prev) {
+static cJSON* createConditions(const HUD* curr, const HUD* prev) {
 	cJSON* obj = cJSON_CreateObject();
 
 	if (!obj) {
@@ -119,7 +125,7 @@ static cJSON* createConditions(HUD* curr, HUD* prev) {
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
  */
-static cJSON* createPitstop(HUD* curr, HUD* prev) {
+static cJSON* createPitstop(const HUD* curr, const HUD* prev) {
 	cJSON* obj = cJSON_CreateObject();
 
 	if (!obj) {
@@ -147,7 +153,7 @@ static cJSON* createPitstop(HUD* curr, HUD* prev) {
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
  */
-static cJSON* createPenalty(HUD* curr, HUD* prev) {
+static cJSON* createPenalty(const HUD* curr, const HUD* prev) {
 	cJSON* obj = cJSON_CreateObject();
 
 	if (!obj) {
@@ -166,7 +172,7 @@ static cJSON* createPenalty(HUD* curr, HUD* prev) {
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
  */
-static cJSON* createDrivingTime(HUD* curr, HUD* prev) {
+static cJSON* createDrivingTime(const HUD* curr, const HUD* prev) {
 	cJSON* obj = cJSON_CreateObject();
 
 	if (!obj) {
@@ -185,7 +191,7 @@ static cJSON* createDrivingTime(HUD* curr, HUD* prev) {
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
  */
-static cJSON* createFuel(HUD* curr, HUD* prev) {
+static cJSON* createFuel(const HUD* curr, const HUD* prev) {
 	cJSON* obj = cJSON_CreateObject();
 
 	if (!obj) {
@@ -198,6 +204,21 @@ static cJSON* createFuel(HUD* curr, HUD* prev) {
 	return obj;
 }
 
+static cJSON* createYellow(const HUD* curr, const HUD* prev) {
+	cJSON* obj = cJSON_CreateObject();
+
+	if (!obj) {
+		return NULL;
+	}
+
+	BOOL_2_OBJ(obj, "global", prev, prev->globalYellow, curr->globalYellow);
+	BOOL_2_OBJ(obj, "sector1", prev, prev->yellow1, curr->yellow1);
+	BOOL_2_OBJ(obj, "sector2", prev, prev->yellow2, curr->yellow2);
+	BOOL_2_OBJ(obj, "sector3", prev, prev->yellow3, curr->yellow3);
+
+	return obj;
+}
+
 /**
  * current, yellow, yellow.global, yellow.sector1, yellow.sector2, yellow.sector3, white,
  * green, chequered, red.
@@ -205,7 +226,7 @@ static cJSON* createFuel(HUD* curr, HUD* prev) {
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
  */
-static cJSON* createFlag(HUD* curr, HUD* prev) {
+static cJSON* createFlag(const HUD* curr, const HUD* prev) {
 	cJSON* obj = cJSON_CreateObject();
 
 	if (!obj) {
@@ -218,7 +239,7 @@ static cJSON* createFlag(HUD* curr, HUD* prev) {
 	BOOL_2_OBJ(obj, "red", prev, prev->globalRed, curr->globalRed);
 	BOOL_2_OBJ(obj, "white", prev, prev->globalWhite, curr->globalWhite);
 
-	cJSON* yellow = cJSON_CreateObject();
+	cJSON* yellow = createYellow(curr, prev);
 
 	if (!yellow) {
 		RET_NULL(obj);
@@ -226,44 +247,32 @@ static cJSON* createFlag(HUD* curr, HUD* prev) {
 
 	cJSON_AddItemToObject(obj, "yellow", yellow);
 
-	// need to use multiple if statements instead of the macro in case
-	// adding the boolean to the yellow object fails, the macro would delete
-	// the yellow object and not the parent flag object (obj). i.e. memory leak.
-	if (!prev || prev->globalYellow != curr->globalYellow) {
-		if (!cJSON_AddBoolToObject(yellow, "global", curr->globalYellow)) {
-			RET_NULL(obj);
-		}
-	}
-
-	if (!prev || prev->yellow1 != curr->yellow1) {
-		if (!cJSON_AddBoolToObject(yellow, "sector1", curr->yellow1)) {
-			RET_NULL(obj);
-		}
-	}
-
-	if (!prev || prev->yellow2 != curr->yellow2) {
-		if (!cJSON_AddBoolToObject(yellow, "sector2", curr->yellow2)) {
-			RET_NULL(obj);
-		}
-	}
-
-	if (!prev || prev->yellow3 != curr->yellow3) {
-		if (!cJSON_AddBoolToObject(yellow, "sector3", curr->yellow3)) {
-			RET_NULL(obj);
-		}
-	}
-
 	return obj;
 }
 
+// remember to update when adding additional sub-objects
+#define HUD_ITEM_COUNT 9
+
+static const struct item items[HUD_ITEM_COUNT] = {
+	{"laptimes", &createLaptimes},
+	{"electronics", &createElectronics},
+	{"session", &createSession},
+	{"conditions", &createConditions},
+	{"pitstop", &createPitstop},
+	{"penalty", &createPenalty},
+	{"drivingTime", &createDrivingTime},
+	{"fuel", &createFuel},
+	{"flag", &createFlag}
+};
+
 /**
- * trackStatus, position, distanceTraveled, gameStatus, laps, isBoxed, isInPitLane,
- * mandatoryPitDone, rainTyres, tyreCompound.
+ * Adds the sub-objects above along with: trackStatus, position, distanceTraveled, gameStatus,
+ * laps, isBoxed, isInPitLane, mandatoryPitDone, rainTyres, tyreCompound.
  *
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
  */
-static cJSON* createStatus(HUD* curr, HUD* prev) {
+cJSON* hudToJSON(const HUD* curr, const HUD* prev) {
 	cJSON* obj = cJSON_CreateObject();
 
 	if (!obj) {
@@ -295,47 +304,16 @@ static cJSON* createStatus(HUD* curr, HUD* prev) {
 	BOOL_2_OBJ(obj, "mandatoryPitDone", prev, prev->mandatoryPitDone, curr->mandatoryPitDone);
 	BOOL_2_OBJ(obj, "rainTyres", prev, prev->rainTyres, curr->rainTyres);
 
-	return obj;
-}
-
-// struct grouping together the json key and the function that creates the json object.
-struct subObject {
-	char* key;
-	cJSON* (*fn)(HUD*, HUD*);
-};
-
-// remember to update when adding additional sub-objects
-#define HUD_OBJ_COUNT 10
-
-static const struct subObject subObjects[HUD_OBJ_COUNT] = {
-	{"laptimes", &createLaptimes},
-	{"electronics", &createElectronics},
-	{"session", &createSession},
-	{"conditions", &createConditions},
-	{"pitstop", &createPitstop},
-	{"penalty", &createPenalty},
-	{"drivingTime", &createDrivingTime},
-	{"fuel", &createFuel},
-	{"flag", &createFlag},
-	{"status", &createStatus}
-};
-
-cJSON* hudToJSON(HUD* curr, HUD* prev) {
-	cJSON* json = cJSON_CreateObject();
-
-	if (!json) {
-		return NULL;
-	}
-
-	for (int i = 0; i < HUD_OBJ_COUNT; i++) {
-		cJSON* ptr = subObjects[i].fn(curr, prev);
+	// add sub-objects
+	for (int i = 0; i < HUD_ITEM_COUNT; i++) {
+		cJSON* ptr = items[i].create(curr, prev);
 
 		if (!ptr) {
-			RET_NULL(json);
+			RET_NULL(obj);
 		}
 
-		cJSON_AddItemToObject(json, subObjects[i].key, ptr);
+		cJSON_AddItemToObject(obj, items[i].key, ptr);
 	}
 
-	return json;
+	return obj;
 }

@@ -53,7 +53,7 @@ typedef struct hud {
 	// duplicate of completedLaps
 	int numberOfLaps;
 
-	// tyre compound (I imagine this would be DHD2 or DHE etc.)
+	// tyre compound (either dry_compound or wet_compound)
 	wchar_t tyreCompound[33];
 
 	// not used in ACC
@@ -233,6 +233,6 @@ typedef struct hud {
 	RainIntensity rainIntensity30;
 } HUD;
 
-cJSON* hudToJSON(HUD*, HUD*);
+cJSON* hudToJSON(const HUD*, const HUD*);
 
 #endif
