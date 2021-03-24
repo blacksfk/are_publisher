@@ -96,8 +96,7 @@ static cJSON* createWeekend(const Properties* props) {
 	}
 
 	BOOL_2_OBJ(obj, "penaltiesEnabled", props->penaltiesEnabled);
-	BOOL_2_OBJ(obj, "tyreBlankets", props->allowTyreBlankets);
-
+	NUM_2_OBJ(obj, "tyreBlankets", props->allowTyreBlankets);
 	NUM_2_OBJ(obj, "fuelRate", props->fuelRate);
 	NUM_2_OBJ(obj, "tyreRate", props->tyreRate);
 	NUM_2_OBJ(obj, "damageRate", props->damageRate);
