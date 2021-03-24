@@ -20,9 +20,7 @@ static cJSON* createLaptimes(const HUD* curr, const HUD* prev) {
 	}
 
 	// current lap time should always be different so need for comparison
-	if (!cJSON_AddNumberToObject(obj, "current", curr->currentTime)) {
-		RET_NULL(obj);
-	}
+	NUM_2_OBJ(obj, "current", curr->currentTime);
 
 	NUM_2_OBJ_CMP(obj, "last", prev, prev->lastTime, curr->lastTime);
 	NUM_2_OBJ_CMP(obj, "best", prev, prev->bestTime, curr->bestTime);
@@ -87,6 +85,26 @@ static cJSON* createSession(const HUD* curr, const HUD* prev) {
 }
 
 /**
+ * current, in10, in30.
+ *
+ * @param  curr Current frame HUD data.
+ * @param  prev Previous frame HUD data.
+ */
+static cJSON* createRain(const HUD* curr, const HUD* prev) {
+	cJSON* obj = cJSON_CreateObject();
+
+	if (!obj) {
+		return NULL;
+	}
+
+	NUM_2_OBJ_CMP(obj, "current", prev, prev->rainIntensityCurr, curr->rainIntensityCurr);
+	NUM_2_OBJ_CMP(obj, "in10", prev, prev->rainIntensity10, curr->rainIntensity10);
+	NUM_2_OBJ_CMP(obj, "in30", prev, prev->rainIntensity30, curr->rainIntensity30);
+
+	return obj;
+}
+
+/**
  * surfaceGrip, windSpeed, windDirection, track, rain, rain.current, rain.in10, rain.in30.
  *
  * @param  curr Current frame HUD data.
@@ -104,17 +122,37 @@ static cJSON* createConditions(const HUD* curr, const HUD* prev) {
 	NUM_2_OBJ_CMP(obj, "windDirection", prev, prev->windDirection, curr->windDirection);
 	NUM_2_OBJ_CMP(obj, "track", prev, prev->trackGrip, curr->trackGrip);
 
-	cJSON* rain = cJSON_CreateObject();
+	// add rain parameters
+	cJSON* ptr = createRain(curr, prev);
 
-	if (!rain) {
+	if (!ptr) {
 		RET_NULL(obj);
 	}
 
-	NUM_2_OBJ_CMP(rain, "current", prev, prev->rainIntensityCurr, curr->rainIntensityCurr);
-	NUM_2_OBJ_CMP(rain, "in10", prev, prev->rainIntensity10, curr->rainIntensity10);
-	NUM_2_OBJ_CMP(rain, "in30", prev, prev->rainIntensity30, curr->rainIntensity30);
+	if (!cJSON_AddItemToObject(obj, "rain", ptr)) {
+		cJSON_Delete(ptr);
+		cJSON_Delete(obj);
 
-	cJSON_AddItemToObject(obj, "rain", rain);
+		return NULL;
+	}
+
+	return obj;
+}
+
+/**
+ * fl, fr, rl, rr.
+ */
+static cJSON* createPressure(const HUD* curr, const HUD* prev) {
+	cJSON* obj = cJSON_CreateObject();
+
+	if (!obj) {
+		return NULL;
+	}
+
+	NUM_2_OBJ_CMP(obj, "fl", prev, prev->pitStopFL, curr->pitStopFL);
+	NUM_2_OBJ_CMP(obj, "fr", prev, prev->pitStopFR, curr->pitStopFR);
+	NUM_2_OBJ_CMP(obj, "rl", prev, prev->pitStopRL, curr->pitStopRL);
+	NUM_2_OBJ_CMP(obj, "rr", prev, prev->pitStopRR, curr->pitStopRR);
 
 	return obj;
 }
@@ -135,14 +173,18 @@ static cJSON* createPitstop(const HUD* curr, const HUD* prev) {
 	NUM_2_OBJ_CMP(obj, "tyreSet", prev, prev->pitStopTyreSet, curr->pitStopTyreSet);
 	NUM_2_OBJ_CMP(obj, "fuel", prev, prev->pitStopFuel, curr->pitStopFuel);
 
-	cJSON* pressure = cJSON_CreateObject();
+	cJSON* pressure = createPressure(curr, prev);
 
-	NUM_2_OBJ_CMP(pressure, "fl", prev, prev->pitStopFL, curr->pitStopFL);
-	NUM_2_OBJ_CMP(pressure, "fr", prev, prev->pitStopFR, curr->pitStopFR);
-	NUM_2_OBJ_CMP(pressure, "rl", prev, prev->pitStopRL, curr->pitStopRL);
-	NUM_2_OBJ_CMP(pressure, "rr", prev, prev->pitStopRR, curr->pitStopRR);
+	if (!pressure) {
+		RET_NULL(obj);
+	}
 
-	cJSON_AddItemToObject(obj, "pressure", pressure);
+	if (!cJSON_AddItemToObject(obj, "pressure", pressure)) {
+		cJSON_Delete(obj);
+		cJSON_Delete(pressure);
+
+		return NULL;
+	}
 
 	return obj;
 }
@@ -245,7 +287,12 @@ static cJSON* createFlag(const HUD* curr, const HUD* prev) {
 		RET_NULL(obj);
 	}
 
-	cJSON_AddItemToObject(obj, "yellow", yellow);
+	if (!cJSON_AddItemToObject(obj, "yellow", yellow)) {
+		cJSON_Delete(yellow);
+		cJSON_Delete(obj);
+
+		return NULL;
+	}
 
 	return obj;
 }
@@ -312,7 +359,12 @@ cJSON* hudToJSON(const HUD* curr, const HUD* prev) {
 			RET_NULL(obj);
 		}
 
-		cJSON_AddItemToObject(obj, items[i].key, ptr);
+		if (!cJSON_AddItemToObject(obj, items[i].key, ptr)) {
+			cJSON_Delete(ptr);
+			cJSON_Delete(obj);
+
+			return NULL;
+		}
 	}
 
 	return obj;

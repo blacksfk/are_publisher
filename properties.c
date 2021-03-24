@@ -151,7 +151,12 @@ cJSON* propertiesToJSON(const Properties* props) {
 			RET_NULL(obj);
 		}
 
-		cJSON_AddItemToObject(obj, items[i].key, ptr);
+		if (!cJSON_AddItemToObject(obj, items[i].key, ptr)) {
+			cJSON_Delete(obj);
+			cJSON_Delete(ptr);
+
+			return NULL;
+		}
 	}
 
 	return obj;
