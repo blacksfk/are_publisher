@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <wchar.h>
 
-#include "cJSON.h"
+#include <cjson/cJSON.h>
 
 #define RET_NULL(x) {\
 	cJSON_Delete(x);\
