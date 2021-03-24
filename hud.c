@@ -171,6 +171,7 @@ static cJSON* createPitstop(const HUD* curr, const HUD* prev) {
 	}
 
 	NUM_2_OBJ_CMP(obj, "tyreSet", prev, prev->pitStopTyreSet, curr->pitStopTyreSet);
+	NUM_2_OBJ_CMP(obj, "strategyTyreSet", prev, prev->strategyTyreSet, curr->strategyTyreSet);
 	NUM_2_OBJ_CMP(obj, "fuel", prev, prev->pitStopFuel, curr->pitStopFuel);
 
 	cJSON* pressure = createPressure(curr, prev);
@@ -345,6 +346,7 @@ cJSON* hudToJSON(const HUD* curr, const HUD* prev) {
 	NUM_2_OBJ_CMP(obj, "distanceTraveled", prev, prev->distanceTraveled, curr->distanceTraveled);
 	NUM_2_OBJ_CMP(obj, "gameStatus", prev, prev->status, curr->status);
 	NUM_2_OBJ_CMP(obj, "laps", prev, prev->completedLaps, curr->completedLaps);
+	NUM_2_OBJ_CMP(obj, "tyreSet", prev, prev->currTyreSet, curr->currTyreSet);
 
 	BOOL_2_OBJ_CMP(obj, "isBoxed", prev, prev->isBoxed, curr->isBoxed);
 	BOOL_2_OBJ_CMP(obj, "isInPitLane", prev, prev->isInPitLane, curr->isInPitLane);
