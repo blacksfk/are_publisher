@@ -237,7 +237,10 @@ typedef struct hud {
 	// 1 .. n = dry tyre set
 	int currTyreSet;
 
-	// possible duplicate of pitStopTyreSet
+	// similar to pitStopTyre set:
+	// pitStopTyre set is the currently selected tyre set for the next pit stop by the driver,
+	// whereas strategyTyreSet is the tyre set that was selected for the current pit strategy
+	// in the setup menu.
 	int strategyTyreSet;
 } HUD;
 
