@@ -231,6 +231,14 @@ typedef struct hud {
 	RainIntensity rainIntensityCurr;
 	RainIntensity rainIntensity10;
 	RainIntensity rainIntensity30;
+
+	// the tyre set on the car
+	// 0 = wet tyres
+	// 1 .. n = dry tyre set
+	int currTyreSet;
+
+	// possible duplicate of pitStopTyreSet
+	int strategyTyreSet;
 } HUD;
 
 cJSON* hudToJSON(const HUD*, const HUD*);
