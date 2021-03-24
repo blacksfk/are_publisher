@@ -23,6 +23,8 @@ cJSON* addWstrToObject(cJSON* obj, char* key, const wchar_t* wstr) {
 	// but subtract one anyway to be safe
 	if (wcstombs_s(NULL, mbstr, len, wstr, len - 1) != 0) {
 		// conversion failed
+		free(mbstr);
+
 		return NULL;
 	}
 
