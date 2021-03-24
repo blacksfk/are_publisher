@@ -72,7 +72,7 @@ int main() {
  * @return          A pointer to the start of the map or NULL if the file mapping failed.
  */
 LPVOID mapSharedMemory(wchar_t* location, size_t size) {
-	HANDLE file = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, size, location);
+	HANDLE file = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, (DWORD) size, location);
 
 	if (!file) {
 		return NULL;
