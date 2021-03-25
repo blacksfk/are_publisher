@@ -2,7 +2,13 @@
 #define MAIN_H
 
 #include <stdio.h>
+
+// classic MS and non-conforming code
+// supress C5105 (undefined behaviour of "defined" in macro expansion) for the windows
+// header files and then re-enable it for the rest of the program
+#pragma warning(disable:5105)
 #include <windows.h>
+#pragma warning(default:5105)
 
 #include "physics.h"
 #include "hud.h"
