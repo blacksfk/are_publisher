@@ -77,7 +77,7 @@ static cJSON* createSession(const HUD* curr, const HUD* prev) {
 	}
 
 	NUM_2_OBJ_CMP(obj, "type", prev, prev->session, curr->session);
-	NUM_2_OBJ_CMP(obj, "sessionTimeLeft", prev, prev->sessionTimeLeft, curr->sessionTimeLeft);
+	NUM_2_OBJ_CMP(obj, "timeLeft", prev, prev->sessionTimeLeft, curr->sessionTimeLeft);
 	NUM_2_OBJ_CMP(obj, "activeCars", prev, prev->activeCars, curr->activeCars);
 	NUM_2_OBJ_CMP(obj, "clock", prev, prev->clock, curr->clock);
 
