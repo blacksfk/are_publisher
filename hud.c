@@ -76,7 +76,37 @@ static cJSON* createSession(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ_CMP(obj, "type", prev, prev->session, curr->session);
+	if (!prev || prev->session != curr->session) {
+		char* str;
+
+		switch (curr->session) {
+			case ST_PRACTICE:
+				str = "Practice";
+				break;
+			case ST_QUALIFY:
+				str = "Qualifying";
+				break;
+			case ST_RACE:
+				str = "Race";
+				break;
+			case ST_HOTLAP:
+				str = "Hot Lap";
+				break;
+			case ST_HOTSTINT:
+				str = "Hot Stint";
+				break;
+			case ST_SUPERPOLE:
+				str = "Super Pole";
+				break;
+			default:
+				str = "Unknown";
+		}
+
+		if (!cJSON_AddStringToObject(obj, "type", str)) {
+			RET_NULL(obj);
+		}
+	}
+
 	NUM_2_OBJ_CMP(obj, "timeLeft", prev, prev->sessionTimeLeft, curr->sessionTimeLeft);
 	NUM_2_OBJ_CMP(obj, "activeCars", prev, prev->activeCars, curr->activeCars);
 	NUM_2_OBJ_CMP(obj, "clock", prev, prev->clock, curr->clock);
