@@ -115,6 +115,40 @@ static cJSON* createSession(const HUD* curr, const HUD* prev) {
 }
 
 /**
+ * Determine the rain intensity level and embed the corresponding string
+ * in obj under key.
+ *
+ * @param ri
+ * @param obj
+ * @param key
+ */
+static cJSON* rainIntensity(RainIntensity ri, cJSON* obj, char* key) {
+	char* str;
+
+	switch (curr->rainIntensityCurr) {
+		case R_DRIZZLE:
+			str = "Drizzle";
+			break;
+		case R_LIGHT:
+			str = "Light";
+			break;
+		case R_MEDIUM:
+			str = "Medium";
+			break;
+		case R_HEAVY:
+			str = "Heavy";
+			break;
+		case R_THUNDERSTORM:
+			str = "Thunderstorm";
+			break;
+		default:
+			str = "None";
+	}
+
+	return cJSON_AddStringToObject(obj, key, str);
+}
+
+/**
  * current, in10, in30.
  *
  * @param  curr Current frame HUD data.
@@ -127,9 +161,23 @@ static cJSON* createRain(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ_CMP(obj, "current", prev, prev->rainIntensityCurr, curr->rainIntensityCurr);
-	NUM_2_OBJ_CMP(obj, "in10", prev, prev->rainIntensity10, curr->rainIntensity10);
-	NUM_2_OBJ_CMP(obj, "in30", prev, prev->rainIntensity30, curr->rainIntensity30);
+	if (!prev || prev->rainIntensityCurr != curr->rainIntensityCurr) {
+		if (!rainIntensity(curr->rainIntensityCurr, obj, "current")) {
+			RET_NULL(obj);
+		}
+	}
+
+	if (!prev || prev->rainIntensity10 != curr->rainIntensity10) {
+		if (!rainIntensity(curr->rainIntensity10, obj, "in10")) {
+			RET_NULL(obj);
+		}
+	}
+
+	if (!prev || prev->rainIntensity30 != curr->rainIntensity30) {
+		if (!rainIntensity(curr->rainIntensity30, obj, "in30")) {
+			RET_NULL(obj);
+		}
+	}
 
 	return obj;
 }
