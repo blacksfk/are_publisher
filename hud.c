@@ -125,7 +125,7 @@ static cJSON* createSession(const HUD* curr, const HUD* prev) {
 static cJSON* rainIntensity(RainIntensity ri, cJSON* obj, char* key) {
 	char* str;
 
-	switch (curr->rainIntensityCurr) {
+	switch (ri) {
 		case R_DRIZZLE:
 			str = "Drizzle";
 			break;
