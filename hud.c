@@ -197,7 +197,38 @@ static cJSON* createConditions(const HUD* curr, const HUD* prev) {
 
 	NUM_2_OBJ_CMP(obj, "windSpeed", prev, prev->windSpeed, curr->windSpeed);
 	NUM_2_OBJ_CMP(obj, "windDirection", prev, prev->windDirection, curr->windDirection);
-	NUM_2_OBJ_CMP(obj, "track", prev, prev->trackGrip, curr->trackGrip);
+
+	// track grip
+	if (!prev || prev->trackGrip != curr->trackGrip) {
+		char* str;
+
+		switch (curr->trackGrip) {
+			case TG_FAST:
+				str = "Fast";
+				break;
+			case TG_OPTIMUM:
+				str = "Optimum";
+				break;
+			case TG_GREASY:
+				str = "Greasy";
+				break;
+			case TG_DAMP:
+				str = "Damp";
+				break;
+			case TG_WET:
+				str = "Wet";
+				break;
+			case TG_FLOODED:
+				str = "Flooded";
+				break;
+			default:
+				str = "Green";
+		}
+
+		if (!cJSON_AddStringToObject(obj, "track", str)) {
+			RET_NULL(obj);
+		}
+	}
 
 	// add rain parameters
 	cJSON* ptr = createRain(curr, prev);
