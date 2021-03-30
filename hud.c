@@ -135,7 +135,7 @@ static cJSON* createRain(const HUD* curr, const HUD* prev) {
 }
 
 /**
- * surfaceGrip, windSpeed, windDirection, track, rain, rain.current, rain.in10, rain.in30.
+ * windSpeed, windDirection, track, rain, rain.current, rain.in10, rain.in30.
  *
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
@@ -147,7 +147,6 @@ static cJSON* createConditions(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ_CMP(obj, "surfaceGrip", prev, prev->surfaceGrip, curr->surfaceGrip);
 	NUM_2_OBJ_CMP(obj, "windSpeed", prev, prev->windSpeed, curr->windSpeed);
 	NUM_2_OBJ_CMP(obj, "windDirection", prev, prev->windDirection, curr->windDirection);
 	NUM_2_OBJ_CMP(obj, "track", prev, prev->trackGrip, curr->trackGrip);
