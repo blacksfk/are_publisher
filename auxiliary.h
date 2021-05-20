@@ -2,6 +2,7 @@
 #define AUXILIARY_H
 
 #include <stdlib.h>
+#include <string.h>
 #include <wchar.h>
 
 #include <cjson/cJSON.h>
@@ -65,5 +66,6 @@
 }
 
 cJSON* addWstrToObject(cJSON*, char*, const wchar_t*);
+void* clone(const void*, size_t);
 
 #endif
