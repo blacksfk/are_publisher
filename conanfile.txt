@@ -1,5 +1,6 @@
 [requires]
 cjson/1.7.14
+libcurl/7.75.0
 
 [generators]
 cmake
