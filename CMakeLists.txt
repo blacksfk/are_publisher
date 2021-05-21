@@ -11,5 +11,5 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 # executable
-add_executable(are_publisher auxiliary.c hud.c physics.c properties.c main.c)
+add_executable(are_publisher auxiliary.c hud.c physics.c properties.c response.c request.c main.c)
 target_link_libraries(are_publisher ${CONAN_LIBS})
