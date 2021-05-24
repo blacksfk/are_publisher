@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <wchar.h>
 
 #include <cjson/cJSON.h>
