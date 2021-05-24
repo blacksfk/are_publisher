@@ -92,5 +92,6 @@ typedef struct properties {
 } Properties;
 
 cJSON* propertiesToJSON(const Properties*);
+bool propertiesUpdated(const Properties* a, const Properties* b);
 
 #endif

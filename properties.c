@@ -161,3 +161,38 @@ cJSON* propertiesToJSON(const Properties* props) {
 
 	return obj;
 }
+
+// macros to ease typing
+#define INT_CMP(x, y) do {\
+	if (x != y) {\
+		return true;\
+	}\
+} while(0)
+
+#define WCS_CMP(x, y) do {\
+	if (wcscmp(x, y) != 0) {\
+		return true;\
+	}\
+} while(0)
+
+/**
+ * Whether or not the two Properties objects differ.
+ */
+bool propertiesUpdated(const Properties* a, const Properties* b) {
+	INT_CMP(a->sessions, b->sessions);
+	INT_CMP(a->cars, b->cars);
+
+	WCS_CMP(a->carModel, b->carModel);
+	WCS_CMP(a->track, b->track);
+	WCS_CMP(a->firstname, b->firstname);
+	WCS_CMP(a->surname, b->surname);
+	WCS_CMP(a->nickname, b->nickname);
+
+	INT_CMP(a->pitWindowStart, b->pitWindowStart);
+	INT_CMP(a->pitWindowEnd, b->pitWindowEnd);
+
+	INT_CMP(a->isMultiplayer, b->isMultiplayer);
+
+	// if all above match then 99% sure it's the same weekend
+	return false;
+}
