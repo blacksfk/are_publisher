@@ -66,6 +66,5 @@
 } while(0)
 
 cJSON* addWstrToObject(cJSON*, char*, const wchar_t*);
-void* clone(const void*, size_t);
 
 #endif

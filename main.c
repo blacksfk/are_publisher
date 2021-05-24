@@ -72,11 +72,34 @@ int main() {
  * @return          A pointer to the start of the map or NULL if the file mapping failed.
  */
 LPVOID mapSharedMemory(wchar_t* location, size_t size) {
-	HANDLE file = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, (DWORD) size, location);
+	HANDLE file = CreateFileMappingW(
+		INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, (DWORD) size, location
+	);
 
 	if (!file) {
 		return NULL;
 	}
 
 	return MapViewOfFile(file, FILE_MAP_READ, 0, 0, size);
+}
+
+/**
+ * Copies count bytes from the region of memory pointed to by ptr to
+ * a newly-allocated region. Remember to free it! Returns NULL if
+ * the allocation was unsuccessful.
+ *
+ * @param  ptr   Pointer to a region of memory to clone.
+ * @param  count The size of the region of memory.
+ * @return       A shallow clone of the region of memory pointed to by ptr.
+ */
+void* clone(const void* ptr, size_t count) {
+	void* dupe = malloc(count);
+
+	if (!dupe) {
+		return NULL;
+	}
+
+	memcpy(dupe, ptr, count);
+
+	return dupe;
 }

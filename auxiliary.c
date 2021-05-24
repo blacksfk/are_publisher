@@ -36,24 +36,3 @@ cJSON* addWstrToObject(cJSON* obj, char* key, const wchar_t* wstr) {
 
 	return ptr;
 }
-
-/**
- * Copies count bytes from the region of memory pointed to by ptr to
- * a newly-allocated region. Remember to free it! Returns NULL if
- * the allocation was unsuccessful.
- *
- * @param  ptr   Pointer to a region of memory to clone.
- * @param  count The size of the region of memory.
- * @return       A shallow clone of the region of memory pointed to by ptr.
- */
-void* clone(const void* ptr, size_t count) {
-	void* dupe = malloc(count);
-
-	if (!dupe) {
-		return NULL;
-	}
-
-	memcpy(dupe, ptr, count);
-
-	return dupe;
-}

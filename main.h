@@ -19,5 +19,9 @@
 #define SM_PROPS L"Local\\acpmf_static"
 
 LPVOID mapSharedMemory(wchar_t*, size_t);
+CURL* initCurl();
+char* toJSON(struct memMaps prev, struct memMaps curr);
+bool publish(CURL*, struct config, char*);
+void* clone(const void*, size_t);
 
 #endif
