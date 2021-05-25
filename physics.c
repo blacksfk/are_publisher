@@ -34,10 +34,10 @@ static cJSON* createBrakePressure(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ_CMP(obj, "fl", prev, prev->brakePressure[0], curr->brakePressure[0]);
-	NUM_2_OBJ_CMP(obj, "fr", prev, prev->brakePressure[1], curr->brakePressure[1]);
-	NUM_2_OBJ_CMP(obj, "rl", prev, prev->brakePressure[2], curr->brakePressure[2]);
-	NUM_2_OBJ_CMP(obj, "rr", prev, prev->brakePressure[3], curr->brakePressure[3]);
+	NUM_2_OBJ_CMP(obj, "fl", prev, prev->brakePressure[W_FL], curr->brakePressure[W_FL]);
+	NUM_2_OBJ_CMP(obj, "fr", prev, prev->brakePressure[W_FR], curr->brakePressure[W_FR]);
+	NUM_2_OBJ_CMP(obj, "rl", prev, prev->brakePressure[W_RL], curr->brakePressure[W_RL]);
+	NUM_2_OBJ_CMP(obj, "rr", prev, prev->brakePressure[W_RR], curr->brakePressure[W_RR]);
 
 	return obj;
 }
@@ -49,10 +49,10 @@ static cJSON* createPadWear(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ_CMP(obj, "fl", prev, prev->padWear[0], curr->padWear[0]);
-	NUM_2_OBJ_CMP(obj, "fr", prev, prev->padWear[1], curr->padWear[1]);
-	NUM_2_OBJ_CMP(obj, "rl", prev, prev->padWear[2], curr->padWear[2]);
-	NUM_2_OBJ_CMP(obj, "rr", prev, prev->padWear[3], curr->padWear[3]);
+	NUM_2_OBJ_CMP(obj, "fl", prev, prev->padWear[W_FL], curr->padWear[W_FL]);
+	NUM_2_OBJ_CMP(obj, "fr", prev, prev->padWear[W_FR], curr->padWear[W_FR]);
+	NUM_2_OBJ_CMP(obj, "rl", prev, prev->padWear[W_RL], curr->padWear[W_RL]);
+	NUM_2_OBJ_CMP(obj, "rr", prev, prev->padWear[W_RR], curr->padWear[W_RR]);
 
 	return obj;
 }
@@ -64,10 +64,10 @@ static cJSON* createDiscWear(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ_CMP(obj, "fl", prev, prev->discWear[0], curr->discWear[0]);
-	NUM_2_OBJ_CMP(obj, "fr", prev, prev->discWear[1], curr->discWear[1]);
-	NUM_2_OBJ_CMP(obj, "rl", prev, prev->discWear[2], curr->discWear[2]);
-	NUM_2_OBJ_CMP(obj, "rr", prev, prev->discWear[3], curr->discWear[3]);
+	NUM_2_OBJ_CMP(obj, "fl", prev, prev->discWear[W_FL], curr->discWear[W_FL]);
+	NUM_2_OBJ_CMP(obj, "fr", prev, prev->discWear[W_FR], curr->discWear[W_FR]);
+	NUM_2_OBJ_CMP(obj, "rl", prev, prev->discWear[W_RL], curr->discWear[W_RL]);
+	NUM_2_OBJ_CMP(obj, "rr", prev, prev->discWear[W_RR], curr->discWear[W_RR]);
 
 	return obj;
 }
@@ -79,10 +79,10 @@ static cJSON* createBrakeTemp(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ_CMP(obj, "fl", prev, prev->brakeTemp[0], curr->brakeTemp[0]);
-	NUM_2_OBJ_CMP(obj, "fr", prev, prev->brakeTemp[1], curr->brakeTemp[1]);
-	NUM_2_OBJ_CMP(obj, "rl", prev, prev->brakeTemp[2], curr->brakeTemp[2]);
-	NUM_2_OBJ_CMP(obj, "rr", prev, prev->brakeTemp[3], curr->brakeTemp[3]);
+	NUM_2_OBJ_CMP(obj, "fl", prev, prev->brakeTemp[W_FL], curr->brakeTemp[W_FL]);
+	NUM_2_OBJ_CMP(obj, "fr", prev, prev->brakeTemp[W_FR], curr->brakeTemp[W_FR]);
+	NUM_2_OBJ_CMP(obj, "rl", prev, prev->brakeTemp[W_RL], curr->brakeTemp[W_RL]);
+	NUM_2_OBJ_CMP(obj, "rr", prev, prev->brakeTemp[W_RR], curr->brakeTemp[W_RR]);
 
 	return obj;
 }
@@ -199,10 +199,10 @@ static cJSON* createTyrePressure(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ_CMP(obj, "fl", prev, prev->tyrePressure[0], curr->tyrePressure[0]);
-	NUM_2_OBJ_CMP(obj, "fr", prev, prev->tyrePressure[1], curr->tyrePressure[1]);
-	NUM_2_OBJ_CMP(obj, "rl", prev, prev->tyrePressure[2], curr->tyrePressure[2]);
-	NUM_2_OBJ_CMP(obj, "rr", prev, prev->tyrePressure[3], curr->tyrePressure[3]);
+	NUM_2_OBJ_CMP(obj, "fl", prev, prev->tyrePressure[W_FL], curr->tyrePressure[W_FL]);
+	NUM_2_OBJ_CMP(obj, "fr", prev, prev->tyrePressure[W_FR], curr->tyrePressure[W_FR]);
+	NUM_2_OBJ_CMP(obj, "rl", prev, prev->tyrePressure[W_RL], curr->tyrePressure[W_RL]);
+	NUM_2_OBJ_CMP(obj, "rr", prev, prev->tyrePressure[W_RR], curr->tyrePressure[W_RR]);
 
 	return obj;
 }
@@ -214,10 +214,10 @@ static cJSON* createTyreTemp(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ_CMP(obj, "fl", prev, prev->tyreCoreTemp[0], curr->tyreCoreTemp[0]);
-	NUM_2_OBJ_CMP(obj, "fr", prev, prev->tyreCoreTemp[1], curr->tyreCoreTemp[1]);
-	NUM_2_OBJ_CMP(obj, "rl", prev, prev->tyreCoreTemp[2], curr->tyreCoreTemp[2]);
-	NUM_2_OBJ_CMP(obj, "rr", prev, prev->tyreCoreTemp[3], curr->tyreCoreTemp[3]);
+	NUM_2_OBJ_CMP(obj, "fl", prev, prev->tyreCoreTemp[W_FL], curr->tyreCoreTemp[W_FL]);
+	NUM_2_OBJ_CMP(obj, "fr", prev, prev->tyreCoreTemp[W_FR], curr->tyreCoreTemp[W_FR]);
+	NUM_2_OBJ_CMP(obj, "rl", prev, prev->tyreCoreTemp[W_RL], curr->tyreCoreTemp[W_RL]);
+	NUM_2_OBJ_CMP(obj, "rr", prev, prev->tyreCoreTemp[W_RR], curr->tyreCoreTemp[W_RR]);
 
 	return obj;
 }
@@ -296,11 +296,11 @@ static cJSON* createDamage(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ_CMP(obj, "front", prev, prev->carDamage[0], curr->carDamage[0]);
-	NUM_2_OBJ_CMP(obj, "rear", prev, prev->carDamage[1], curr->carDamage[1]);
-	NUM_2_OBJ_CMP(obj, "left", prev, prev->carDamage[2], curr->carDamage[2]);
-	NUM_2_OBJ_CMP(obj, "right", prev, prev->carDamage[3], curr->carDamage[3]);
-	NUM_2_OBJ_CMP(obj, "centre", prev, prev->carDamage[4], curr->carDamage[4]);
+	NUM_2_OBJ_CMP(obj, "front", prev, prev->carDamage[DMG_F], curr->carDamage[DMG_F]);
+	NUM_2_OBJ_CMP(obj, "rear", prev, prev->carDamage[DMG_B], curr->carDamage[DMG_B]);
+	NUM_2_OBJ_CMP(obj, "left", prev, prev->carDamage[DMG_L], curr->carDamage[DMG_L]);
+	NUM_2_OBJ_CMP(obj, "right", prev, prev->carDamage[DMG_R], curr->carDamage[DMG_R]);
+	NUM_2_OBJ_CMP(obj, "centre", prev, prev->carDamage[DMG_C], curr->carDamage[DMG_C]);
 
 	return obj;
 }
@@ -318,10 +318,10 @@ static cJSON* createSuspensionTravel(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	NUM_2_OBJ_CMP(obj, "fl", prev, prev->suspensionTravel[0], curr->suspensionTravel[0]);
-	NUM_2_OBJ_CMP(obj, "fr", prev, prev->suspensionTravel[1], curr->suspensionTravel[1]);
-	NUM_2_OBJ_CMP(obj, "rl", prev, prev->suspensionTravel[2], curr->suspensionTravel[2]);
-	NUM_2_OBJ_CMP(obj, "rr", prev, prev->suspensionTravel[3], curr->suspensionTravel[3]);
+	NUM_2_OBJ_CMP(obj, "fl", prev, prev->suspensionTravel[W_FL], curr->suspensionTravel[W_FL]);
+	NUM_2_OBJ_CMP(obj, "fr", prev, prev->suspensionTravel[W_FR], curr->suspensionTravel[W_FR]);
+	NUM_2_OBJ_CMP(obj, "rl", prev, prev->suspensionTravel[W_RL], curr->suspensionTravel[W_RL]);
+	NUM_2_OBJ_CMP(obj, "rr", prev, prev->suspensionTravel[W_RR], curr->suspensionTravel[W_RR]);
 
 	return obj;
 }

@@ -2,6 +2,15 @@
 #define PHYSICS_H
 
 #include "auxiliary.h"
+#include "enums.h"
+
+enum carDamage {
+	DMG_F = 0,
+	DMG_B,
+	DMG_L,
+	DMG_R,
+	DMG_C
+};
 
 /**
  * Physics information. Updated once per frame. Player car only.
