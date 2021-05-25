@@ -237,11 +237,13 @@ static cJSON* createConditions(const HUD* curr, const HUD* prev) {
 		RET_NULL(obj);
 	}
 
-	if (!cJSON_AddItemToObject(obj, "rain", ptr)) {
-		cJSON_Delete(ptr);
-		cJSON_Delete(obj);
+	if (cJSON_GetArraySize(ptr) > 0) {
+		if (!cJSON_AddItemToObject(obj, "rain", ptr)) {
+			cJSON_Delete(ptr);
+			cJSON_Delete(obj);
 
-		return NULL;
+			return NULL;
+		}
 	}
 
 	return obj;
@@ -288,11 +290,13 @@ static cJSON* createPitstop(const HUD* curr, const HUD* prev) {
 		RET_NULL(obj);
 	}
 
-	if (!cJSON_AddItemToObject(obj, "pressure", pressure)) {
-		cJSON_Delete(obj);
-		cJSON_Delete(pressure);
+	if (cJSON_GetArraySize(pressure) > 0) {
+		if (!cJSON_AddItemToObject(obj, "pressure", pressure)) {
+			cJSON_Delete(obj);
+			cJSON_Delete(pressure);
 
-		return NULL;
+			return NULL;
+		}
 	}
 
 	return obj;
@@ -396,11 +400,13 @@ static cJSON* createFlag(const HUD* curr, const HUD* prev) {
 		RET_NULL(obj);
 	}
 
-	if (!cJSON_AddItemToObject(obj, "yellow", yellow)) {
-		cJSON_Delete(yellow);
-		cJSON_Delete(obj);
+	if (cJSON_GetArraySize(yellow) > 0) {
+		if (!cJSON_AddItemToObject(obj, "yellow", yellow)) {
+			cJSON_Delete(yellow);
+			cJSON_Delete(obj);
 
-		return NULL;
+			return NULL;
+		}
 	}
 
 	return obj;
@@ -469,11 +475,14 @@ cJSON* hudToJSON(const HUD* curr, const HUD* prev) {
 			RET_NULL(obj);
 		}
 
-		if (!cJSON_AddItemToObject(obj, items[i].key, ptr)) {
-			cJSON_Delete(ptr);
-			cJSON_Delete(obj);
+		// only add ptr to the object if it has at least one sub key
+		if (cJSON_GetArraySize(ptr) > 0) {
+			if (!cJSON_AddItemToObject(obj, items[i].key, ptr)) {
+				cJSON_Delete(ptr);
+				cJSON_Delete(obj);
 
-			return NULL;
+				return NULL;
+			}
 		}
 	}
 
