@@ -136,11 +136,13 @@ static cJSON* createBrakes(const Physics* curr, const Physics* prev) {
 			RET_NULL(obj);
 		}
 
-		if (!cJSON_AddItemToObject(obj, brakeItems[i].key, ptr)) {
-			cJSON_Delete(obj);
-			cJSON_Delete(ptr);
+		if (cJSON_GetArraySize(ptr) > 0) {
+			if (!cJSON_AddItemToObject(obj, brakeItems[i].key, ptr)) {
+				cJSON_Delete(obj);
+				cJSON_Delete(ptr);
 
-			return NULL;
+				return NULL;
+			}
 		}
 	}
 
@@ -248,11 +250,13 @@ static cJSON* createTyres(const Physics* curr, const Physics* prev) {
 			RET_NULL(obj);
 		}
 
-		if (!cJSON_AddItemToObject(obj, tyreItems[i].key, ptr)) {
-			cJSON_Delete(obj);
-			cJSON_Delete(ptr);
+		if (cJSON_GetArraySize(ptr) > 0) {
+			if (!cJSON_AddItemToObject(obj, tyreItems[i].key, ptr)) {
+				cJSON_Delete(obj);
+				cJSON_Delete(ptr);
 
-			return NULL;
+				return NULL;
+			}
 		}
 	}
 
@@ -365,11 +369,13 @@ cJSON* physicsToJSON(const Physics* curr, const Physics* prev) {
 			RET_NULL(physics);
 		}
 
-		if (!cJSON_AddItemToObject(physics, items[i].key, obj)) {
-			cJSON_Delete(physics);
-			cJSON_Delete(obj);
+		if (cJSON_GetArraySize(obj) > 0) {
+			if (!cJSON_AddItemToObject(physics, items[i].key, obj)) {
+				cJSON_Delete(physics);
+				cJSON_Delete(obj);
 
-			return NULL;
+				return NULL;
+			}
 		}
 	}
 
