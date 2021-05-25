@@ -88,7 +88,6 @@ int main(int argc, char** argv) {
 		prev.props = (Properties*) clone(curr.props, szProps);
 		prev.physics = (Physics*) clone(curr.physics, szPhysics);
 
-
 		if (!prev.hud || !prev.props || !prev.physics) {
 			fprintf(
 				stderr,
@@ -110,6 +109,10 @@ int main(int argc, char** argv) {
 			fprintf(stderr, "%d: Process took %llums\n", ARE_DURATION, duration);
 		}
 	}
+
+	free(prev.hud);
+	free(prev.props);
+	free(prev.physics);
 
 	// clean up the curl handle and library
 	curl_easy_cleanup(curl);
