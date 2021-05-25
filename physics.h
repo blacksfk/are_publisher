@@ -2,14 +2,22 @@
 #define PHYSICS_H
 
 #include "auxiliary.h"
-#include "enums.h"
 
+// Car damage position enum.
 enum carDamage {
 	DMG_F = 0,
 	DMG_B,
 	DMG_L,
 	DMG_R,
 	DMG_C
+};
+
+// Wheel type enumeration.
+enum wheelType {
+	W_FL = 0,
+	W_FR,
+	W_RL,
+	W_RR
 };
 
 /**
