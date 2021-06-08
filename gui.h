@@ -6,20 +6,9 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#include <stdlib.h>
 #include <stdbool.h>
 
-// prevent winsock 1.1 from being included by windows.h in order for libcurl to
-// include winsock2.h
-#define WIN32_LEAN_AND_MEAN
-
-// classic MS and non-conforming code
-// supress C5105 (undefined behaviour of "defined" in macro expansion) for the windows
-// header files and then re-enable it for the rest of the program
-#pragma warning(disable:5105)
-#include <windows.h>
-#pragma warning(default:5105)
-
+#include "shared_mem.h"
 #include "request.h"
 
 enum buttons {
@@ -31,6 +20,7 @@ struct formHandlers {
 	HWND lblAddress;
 	HWND lblChannel;
 	HWND lblPassword;
+	HWND lblStatus;
 
 	HWND ctrlAddress;
 	HWND ctrlChannel;
@@ -40,22 +30,35 @@ struct formHandlers {
 };
 
 typedef struct instanceData {
+	// text input buffers
 	wchar_t* address;
 	wchar_t* channel;
 	wchar_t* password;
 
-	struct formHandlers handlers;
+	// curl easy handler
 	CURL* curl;
 
-	// TODO: status label, progress bar??
+	// shared memory object
+	SharedMem* sm;
+
+	// as described above
+	struct formHandlers handlers;
+
+	// function to run once WM_DESTROY is received
+	// should free allocated resources etc.
+	// must call freeInstanceData once other cleanup tasks are complete
+	void (*cleanup)(struct instanceData*);
 } InstanceData;
 
+// how much text could you really enter?? 4096 wchar_t characters should be plenty...
+#define FORM_CTRL_BUF_SIZE 8192
+
 #define WINDOW_CLASS L"are_publisher_class"
-#define WINDOW_TITLE L"ACC Race Engineer Publisher"
+#define WINDOW_TITLE L"ACC Race Engineer"
 
 // main window width and height
 #define WINDOW_W 500
-#define WINDOW_H 300
+#define WINDOW_H 220
 
 // window internal margins
 #define MARGIN_X 10
@@ -80,11 +83,15 @@ typedef struct instanceData {
 #define FORM_GROUP_H (FORM_LBL_H + FORM_MARGIN_H + FORM_CTRL_H + FORM_MARGIN_H)
 
 // styling
-#define FORM_LBL_STYLE (WS_VISIBLE | WS_CHILD)
-#define FORM_CTRL_STYLE (FORM_LBL_STYLE | WS_BORDER | ES_AUTOHSCROLL)
-#define FORM_BTN_STYLE (FORM_LBL_STYLE | BS_CENTER)
+#define FORM_LBL_STYLE (WS_VISIBLE | WS_CHILD | SS_SIMPLE)
+#define FORM_CTRL_STYLE (WS_VISIBLE | WS_CHILD | WS_BORDER | ES_AUTOHSCROLL)
+#define FORM_BTN_STYLE (WS_VISIBLE | WS_CHILD | BS_CENTER)
 #define FORM_BTN_HIDDEN_STYLE (WS_CHILD | BS_CENTER)
 
-bool gui(HINSTANCE h, int cmdShow);
+InstanceData* createInstanceData(
+	CURL* curl, SharedMem* sm, void (*cleanup)(struct instanceData*)
+);
+void freeInstanceData(InstanceData* data);
+bool gui(HINSTANCE h, int cmdShow, InstanceData* data);
 
 #endif

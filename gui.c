@@ -1,12 +1,55 @@
 #include "gui.h"
 
 /**
- * Free all heap allocated members of an instance data struct.
+ * Allocate memory for an instance data struct and initialise various members.
+ * @param  curl
+ * @return      Returns NULL if memory could not be allocated.
  */
-static void freeInstanceData(InstanceData* data) {
+InstanceData* createInstanceData(
+	CURL* curl, SharedMem* sm, void (*cleanup)(struct instanceData*)
+) {
+	InstanceData* data = malloc(sizeof(*data));
+
+	if (!data) {
+		// out of memory
+		return NULL;
+	}
+
+	// allocate memory for text input controls
+	data->address = malloc(FORM_CTRL_BUF_SIZE);
+	data->channel = malloc(FORM_CTRL_BUF_SIZE);
+	data->password = malloc(FORM_CTRL_BUF_SIZE);
+
+	if (!data->address || !data->channel || !data->password) {
+		// out of memory
+		freeInstanceData(data);
+
+		return NULL;
+	}
+
+	// calculate the number of characters (should be FORM_CTRL_BUF_SIZE / 2)
+	size_t count = FORM_CTRL_BUF_SIZE / sizeof(wchar_t);
+
+	// initialise all text input buffers with wchar_t null bytes
+	wmemset(data->address, L'\0', count);
+	wmemset(data->channel, L'\0', count);
+	wmemset(data->password, L'\0', count);
+
+	data->sm = sm;
+	data->curl = curl;
+	data->cleanup = cleanup;
+
+	return data;
+}
+
+/**
+ * Free instance data along with all heap allocated members.
+ */
+void freeInstanceData(InstanceData* data) {
 	free(data->address);
 	free(data->channel);
 	free(data->password);
+	free(data);
 }
 
 /**
@@ -119,6 +162,21 @@ static void createForm(HWND parent, struct formHandlers* handlers) {
 		NULL,
 		NULL
 	);
+
+	// status label
+	handlers->lblStatus = CreateWindowW(
+		L"Static",
+		L"Status: ",
+		FORM_LBL_STYLE,
+		MARGIN_X,
+		MARGIN_Y + (FORM_GROUP_H * 3) + FORM_BTN_H + FORM_MARGIN_H,
+		FORM_LBL_W,
+		FORM_LBL_H,
+		parent,
+		NULL,
+		NULL,
+		NULL
+	);
 }
 
 /**
@@ -153,13 +211,14 @@ static LRESULT CALLBACK windowProcess(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 		// TODO
 		return 0;
 	case WM_DESTROY:
-		freeInstanceData(data);
+		data = (InstanceData*) GetWindowLongPtr(wnd, GWLP_USERDATA);
+		data->cleanup(data);
 		PostQuitMessage(0);
 
 		return 0;
 	}
 
-	return DefWindowProc(wnd, msg, w, l);
+	return DefWindowProcW(wnd, msg, w, l);
 }
 
 /**
@@ -199,8 +258,7 @@ static void setFont(HWND wnd) {
  * @param  cmdShow
  * @return         Returns false if the window could not be created and true otherwise.
  */
-bool gui(HINSTANCE h, int cmdShow) {
-	InstanceData data;
+bool gui(HINSTANCE h, int cmdShow, InstanceData* data) {
 	const wchar_t* class = WINDOW_CLASS;
 	WNDCLASSW wc = {
 		.lpfnWndProc = &windowProcess,
@@ -222,7 +280,7 @@ bool gui(HINSTANCE h, int cmdShow) {
 		NULL,
 		NULL,
 		h,
-		&data
+		data
 	);
 
 	if (!wnd) {
@@ -230,7 +288,7 @@ bool gui(HINSTANCE h, int cmdShow) {
 	}
 
 	// create and add the form controls to the main window
-	createForm(wnd, &data.handlers);
+	createForm(wnd, &data->handlers);
 
 	// show the window
 	ShowWindow(wnd, cmdShow);
