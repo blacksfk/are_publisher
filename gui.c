@@ -180,42 +180,80 @@ static void createForm(HWND parent, struct formHandlers* handlers) {
 }
 
 /**
+ * Handles WM_CREATE.
+ */
+static int wmCreate(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+	(void) msg;
+	(void) w;
+
+	// extract the instance data from the pointer
+	CREATESTRUCT* cs = (CREATESTRUCT*) l;
+	InstanceData* data = (InstanceData*) cs->lpCreateParams;
+
+	// embed the struct in the window as user data
+	SetWindowLongPtr(wnd, GWLP_USERDATA, (LONG_PTR) data);
+
+	return 0;
+}
+
+/**
+ * Handles WM_PAINT.
+ */
+static int wmPaint(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+	(void) msg;
+	(void) w;
+	(void) l;
+
+	PAINTSTRUCT ps;
+	HDC hdc = BeginPaint(wnd, &ps);
+
+	FillRect(hdc, &ps.rcPaint, (HBRUSH), COLOR_WINDOW + 1);
+	EndPaint(wnd, &ps);
+
+	return 0;
+}
+
+/**
+ * Handles WM_COMMAND.
+ */
+static int wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+	// TODO
+	return 0;
+}
+
+/**
+ * Handles WM_DESTROY.
+ */
+static int wmDestroy(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+	(void) msg;
+	(void) w;
+	(void) l;
+
+	// extract struct from the window user data
+	InstanceData* data = (InstanceData*) GetWindowLongPtr(wnd, GWLP_USERDATA);
+
+	// run the cleanup function to release held resources
+	data->cleanup(data);
+
+	// signal the loop to exit
+	PostQuitMessage(0);
+
+	return 0;
+}
+
+/**
  * WindowProc callback.
- * @param  wnd
- * @param  msg
- * @param  w
- * @param  l
  */
 static LRESULT CALLBACK windowProcess(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
-	InstanceData* data = NULL;
-
 	switch (msg) {
 	case WM_CREATE:
-		// extract the form field handler struct from the pointer
-		CREATESTRUCT* cs = (CREATESTRUCT*) l;
-		data = (InstanceData*) cs->lpCreateParams;
-
-		// embed the struct as instance data
-		SetWindowLongPtr(wnd, GWLP_USERDATA, (LONG_PTR) data);
-
-		return 0;
+		return wmCreate(wnd, msg, w, l);
 	case WM_PAINT:
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(wnd, &ps);
-
-		FillRect(hdc, &ps.rcPaint, (HBRUSH) (COLOR_WINDOW + 1));
-		EndPaint(wnd, &ps);
-
-		return 0;
+		return wmPaint(wnd, msg, w, l);
 	case WM_COMMAND:
-		// TODO
-		return 0;
+		return wmCommand(wnd, msg, w, l);
 	case WM_DESTROY:
-		data = (InstanceData*) GetWindowLongPtr(wnd, GWLP_USERDATA);
-		data->cleanup(data);
-		PostQuitMessage(0);
-
-		return 0;
+		return wmDestroy(wnd, msg, w, l);
 	}
 
 	return DefWindowProcW(wnd, msg, w, l);
