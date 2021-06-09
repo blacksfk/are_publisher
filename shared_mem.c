@@ -2,7 +2,6 @@
 
 /**
  * Create a pointer to the shared memory at location.
- *
  * @param  location The shared memory location to map.
  * @param  size     The size of the map.
  * @return          A pointer to the start of the map or NULL if the file mapping failed.
@@ -19,7 +18,10 @@ static void* mapSharedMemory(wchar_t* location, size_t size) {
 	return MapViewOfFile(file, FILE_MAP_READ, 0, 0, size);
 }
 
-
+/**
+ * Creates a shared memory object on the heap and initialises pointers to the
+ * ACC shared memory locations.
+ */
 SharedMem* createSharedMem() {
 	SharedMem* sm = malloc(sizeof(*sm));
 
