@@ -1,15 +1,16 @@
 #ifndef RESPONSE_H
 #define RESPONSE_H
 
-#pragma warning(disable:4996)
-
 #include <stdlib.h>
 #include <string.h>
-// classic MS and non-conforming code
-// supress C5105 (undefined behaviour of "defined" in macro expansion) for the windows
-// header files (included by libcurl)
+
+// curl includes the windows headers so need to disable the warning here too
 #pragma warning(disable:5105)
 #include <curl/curl.h>
+#pragma warning(default:5105)
+
+// stop whinging about POSIX-standard function names
+#pragma warning(disable:4996)
 
 #define BUF_SIZE 1024
 #define HEADER_COUNT 10

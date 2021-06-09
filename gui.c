@@ -1,58 +1,6 @@
 #include "gui.h"
 
 /**
- * Allocate memory for an instance data struct and initialise various members.
- * @param  curl
- * @return      Returns NULL if memory could not be allocated.
- */
-InstanceData* createInstanceData(
-	CURL* curl, SharedMem* sm, void (*cleanup)(struct instanceData*)
-) {
-	InstanceData* data = malloc(sizeof(*data));
-
-	if (!data) {
-		// out of memory
-		return NULL;
-	}
-
-	// allocate memory for text input controls
-	data->address = malloc(FORM_CTRL_BUF_SIZE);
-	data->channel = malloc(FORM_CTRL_BUF_SIZE);
-	data->password = malloc(FORM_CTRL_BUF_SIZE);
-
-	if (!data->address || !data->channel || !data->password) {
-		// out of memory
-		freeInstanceData(data);
-
-		return NULL;
-	}
-
-	// calculate the number of characters (should be FORM_CTRL_BUF_SIZE / 2)
-	size_t count = FORM_CTRL_BUF_SIZE / sizeof(wchar_t);
-
-	// initialise all text input buffers with wchar_t null bytes
-	wmemset(data->address, L'\0', count);
-	wmemset(data->channel, L'\0', count);
-	wmemset(data->password, L'\0', count);
-
-	data->sm = sm;
-	data->curl = curl;
-	data->cleanup = cleanup;
-
-	return data;
-}
-
-/**
- * Free instance data along with all heap allocated members.
- */
-void freeInstanceData(InstanceData* data) {
-	free(data->address);
-	free(data->channel);
-	free(data->password);
-	free(data);
-}
-
-/**
  * Create the static and edit controls and bind them to the parent window.
  * @param parent
  * @param handlers
@@ -182,7 +130,7 @@ static void createForm(HWND parent, struct formHandlers* handlers) {
 /**
  * Handles WM_CREATE.
  */
-static int wmCreate(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+static LRESULT wmCreate(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 	(void) msg;
 	(void) w;
 
@@ -199,7 +147,7 @@ static int wmCreate(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 /**
  * Handles WM_PAINT.
  */
-static int wmPaint(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+static LRESULT wmPaint(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 	(void) msg;
 	(void) w;
 	(void) l;
@@ -207,7 +155,7 @@ static int wmPaint(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 	PAINTSTRUCT ps;
 	HDC hdc = BeginPaint(wnd, &ps);
 
-	FillRect(hdc, &ps.rcPaint, (HBRUSH), COLOR_WINDOW + 1);
+	FillRect(hdc, &ps.rcPaint, (HBRUSH) COLOR_WINDOW + 1);
 	EndPaint(wnd, &ps);
 
 	return 0;
@@ -216,7 +164,7 @@ static int wmPaint(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 /**
  * Handles WM_COMMAND.
  */
-static int wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 	// TODO
 	return 0;
 }
@@ -224,7 +172,7 @@ static int wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 /**
  * Handles WM_DESTROY.
  */
-static int wmDestroy(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+static LRESULT wmDestroy(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 	(void) msg;
 	(void) w;
 	(void) l;

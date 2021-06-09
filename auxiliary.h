@@ -5,8 +5,18 @@
 #include <string.h>
 #include <stdbool.h>
 #include <wchar.h>
-
 #include <cjson/cJSON.h>
+
+// prevent winsock 1.1 from being included by windows.h in order for libcurl to
+// include winsock2.h
+#define WIN32_LEAN_AND_MEAN
+
+// classic MS and non-conforming code
+// supress C5105 (undefined behaviour of "defined" in macro expansion) for the windows
+// header files and then re-enable it for the rest of the program
+#pragma warning(disable:5105)
+#include <windows.h>
+#pragma warning(default:5105)
 
 /**
  * Delete (free) the provided cJSON object and return NULL.

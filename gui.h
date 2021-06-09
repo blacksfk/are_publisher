@@ -6,52 +6,11 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#include <stdbool.h>
-
-#include "shared_mem.h"
-#include "request.h"
+#include "instance_data.h"
 
 enum buttons {
 	BTN_TOGGLE = 1000
 };
-
-// struct that groups the window handlers of the form controls
-struct formHandlers {
-	HWND lblAddress;
-	HWND lblChannel;
-	HWND lblPassword;
-	HWND lblStatus;
-
-	HWND ctrlAddress;
-	HWND ctrlChannel;
-	HWND ctrlPassword;
-
-	HWND btnToggle;
-};
-
-typedef struct instanceData {
-	// text input buffers
-	wchar_t* address;
-	wchar_t* channel;
-	wchar_t* password;
-
-	// curl easy handler
-	CURL* curl;
-
-	// shared memory object
-	SharedMem* sm;
-
-	// as described above
-	struct formHandlers handlers;
-
-	// function to run once WM_DESTROY is received
-	// should free allocated resources etc.
-	// must call freeInstanceData once other cleanup tasks are complete
-	void (*cleanup)(struct instanceData*);
-} InstanceData;
-
-// how much text could you really enter?? 4096 wchar_t characters should be plenty...
-#define FORM_CTRL_BUF_SIZE 8192
 
 #define WINDOW_CLASS L"are_publisher_class"
 #define WINDOW_TITLE L"ACC Race Engineer"
@@ -88,10 +47,6 @@ typedef struct instanceData {
 #define FORM_BTN_STYLE (WS_VISIBLE | WS_CHILD | BS_CENTER)
 #define FORM_BTN_HIDDEN_STYLE (WS_CHILD | BS_CENTER)
 
-InstanceData* createInstanceData(
-	CURL* curl, SharedMem* sm, void (*cleanup)(struct instanceData*)
-);
-void freeInstanceData(InstanceData* data);
 bool gui(HINSTANCE h, int cmdShow, InstanceData* data);
 
 #endif

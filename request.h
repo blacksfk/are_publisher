@@ -4,8 +4,6 @@
 #include <stdarg.h>
 #include "response.h"
 
-// stop whinging about "deprecated" functions
-#pragma warning(disable:4996)
 #define HEADER_DELIMS " :\r\n"
 #define HEADER_CHAN_PW "Channel-Password: "
 
