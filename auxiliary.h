@@ -76,6 +76,7 @@
 	}\
 } while(0)
 
+char* wstrToStr(const wchar_t* wstr);
 cJSON* addWstrToObject(cJSON*, char*, const wchar_t*);
 
 #endif

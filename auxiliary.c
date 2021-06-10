@@ -1,30 +1,38 @@
 #include "auxiliary.h"
 
 /**
+ * Convert a wchar_t* to char*.
+ * @param  wstr
+ * @return      Allocated on the heap. Remember to free it.
+ */
+char* wstrToStr(const wchar_t* wstr) {
+	// allocate sizeof(wchar_t) bytes for every character
+	// in wstr and one extra for the null terminator
+	size_t bytes = wcslen(wstr) * sizeof(wchar_t) + 1;
+	char* str = malloc(bytes);
+
+	if (!str) {
+		// out of memory
+		return NULL;
+	}
+
+	wcstombs(str, wstr, bytes);
+
+	return str;
+}
+
+/**
  * Convert a wchar_t* to a char* and it to obj under key.
- *
  * @param  obj  The object to add the string to.
  * @param  key  The key under which the string will be stored.
  * @param  wstr The string to convert
  * @return      Value of cJSON_AddStringToObject() or NULL if an error occurred.
  */
 cJSON* addWstrToObject(cJSON* obj, char* key, const wchar_t* wstr) {
-	// assume each wchar_t will occupy 2 bytes to guarantee wstr will fit in mbstr
-	// add one for the terminating null
-	size_t len = (wcslen(wstr) + 1) * 2;
-	char* mbstr = malloc(len);
+	char* mbstr = wstrToStr(wstr);
 
 	if (!mbstr) {
-		// allocation failed for some reason
-		return NULL;
-	}
-
-	// insertion of null terminator ('\0') should have no issue due to calculation above,
-	// but subtract one anyway to be safe
-	if (wcstombs_s(NULL, mbstr, len, wstr, len - 1) != 0) {
-		// conversion failed
-		free(mbstr);
-
+		// out of memory
 		return NULL;
 	}
 
