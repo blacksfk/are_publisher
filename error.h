@@ -1,0 +1,14 @@
+#ifndef ERROR_H
+#define ERROR_H
+
+enum areError {
+	ARE_INVALID_ARGS = 1000,
+	ARE_SHARED_MEM_INIT,
+	ARE_OUT_OF_MEM,
+	ARE_CURL,
+	ARE_REQ,
+	ARE_DURATION,
+	ARE_GUI
+};
+
+#endif

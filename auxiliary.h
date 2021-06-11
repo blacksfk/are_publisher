@@ -7,6 +7,8 @@
 #include <wchar.h>
 #include <cjson/cJSON.h>
 
+#include "error.h"
+
 // prevent winsock 1.1 from being included by windows.h in order for libcurl to
 // include winsock2.h
 #define WIN32_LEAN_AND_MEAN
