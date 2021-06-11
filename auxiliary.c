@@ -44,3 +44,15 @@ cJSON* addWstrToObject(cJSON* obj, char* key, const wchar_t* wstr) {
 
 	return ptr;
 }
+
+/**
+ * Show a message box with an error code and static message.
+ * @param e   The error code.
+ * @param str The error message.
+ */
+void msgBoxErr(int e, const wchar_t* str) {
+	wchar_t msg[MSG_BOX_BUF_SIZE];
+
+	swprintf(msg, MSG_BOX_BUF_SIZE, L"%d: %ls.", e, str);
+	MessageBoxW(NULL, msg, L"Error", MB_OK);
+}
