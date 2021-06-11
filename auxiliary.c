@@ -22,6 +22,26 @@ char* wstrToStr(const wchar_t* wstr) {
 }
 
 /**
+ * Convert a char* to wchar_t*.
+ * @param  str
+ * @return     Allocated on the heap. Remember to free it.
+ */
+wchar_t* strToWstr(const char* str) {
+	// allocate the length of str * sizeof(wchar_t) + 2 for wide null terminator
+	size_t bytes = strlen(str) * sizeof(wchar_t) + 2;
+	wchar_t* wstr = malloc(bytes);
+
+	if (!wstr) {
+		// out of memory
+		return NULL;
+	}
+
+	mbstowcs(wstr, str, bytes);
+
+	return wstr;
+}
+
+/**
  * Convert a wchar_t* to a char* and it to obj under key.
  * @param  obj  The object to add the string to.
  * @param  key  The key under which the string will be stored.

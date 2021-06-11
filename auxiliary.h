@@ -82,6 +82,7 @@
 } while(0)
 
 char* wstrToStr(const wchar_t* wstr);
+char* strToWstr(const char* str);
 cJSON* addWstrToObject(cJSON*, char*, const wchar_t*);
 void msgBoxErr(int e, const wchar_t* str);
 
