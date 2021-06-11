@@ -184,68 +184,22 @@ static Response* httpDelete(CURL* curl, const char* url) {
 	return sendRequest(curl, url);
 }
 
-Response* getChannels(CURL* curl, const char* baseURL) {
-	// allocate the length of the url + 1 for the null terminator
-	char* url = malloc(strlen(baseURL) + strlen(CHAN_ENDPOINT) + 1);
-
-	if (!url) {
-		return NULL;
-	}
-
-	strcpy(url, baseURL);
-	strcat(url, CHAN_ENDPOINT);
-
-	// send the request
-	Response* r = httpGet(curl, url);
-
-	free(url);
-
-	return r;
-}
-
 /**
  * Send a JSON blob to the server.
- * @param  curl
- * @param  baseURL Must not contain a trailing slash (/). Eg.: "localhost:3000".
- * @param  cID     The channel ID to publish to.
- * @param  cPW     The channel's password.
- * @param  json    The JSON blob.
- * @return         Returns the response or NULL if memory could not be allocated.
+ * @param  curl     Curl easy handler.
+ * @param  url      Complete URL. Eg.: "localhost:3000/publish/abc123".
+ * @param  pwHeader Complete password header. I.e. "Channel-Password: <pw>".
+ * @param  json     The JSON blob.
+ * @return          Response* or NULL if the headers could not be attached.
  */
-Response* publishData(CURL* curl, const char* baseURL, const char* cID,
-				const char* cPW, const char* json) {
-	// allocate the length of the complete url + 1 for null terminator
-	char* url = malloc(strlen(baseURL) + strlen(PUB_ENDPOINT) + strlen(cID) + 1);
-
-	if (!url) {
-		return NULL;
-	}
-
-	// concatenate the URL
-	strcpy(url, baseURL);
-	strcat(url, PUB_ENDPOINT);
-	strcat(url, cID);
-
-	// allocate the length of the complete header + value + 1 for null terminator
-	char* pwHeader = malloc(strlen(HEADER_CHAN_PW) + strlen(cPW) + 1);
-
-	if (!pwHeader) {
-		free(url);
-
-		return NULL;
-	}
-
-	// concatenate the channel password header
-	strcpy(pwHeader, HEADER_CHAN_PW);
-	strcat(pwHeader, cPW);
-
+Response* publishData(CURL* curl, const char* url,
+					const char* pwHeader, const char* json) {
 	// attach the required headers
-	struct curl_slist* headers = attachHeaders(curl, 2, "Content-Type: application/json", pwHeader);
+	struct curl_slist* headers = attachHeaders(
+		curl, 2, "Content-Type: application/json", pwHeader
+	);
 
 	if (!headers) {
-		free(pwHeader);
-		free(url);
-
 		return NULL;
 	}
 
@@ -255,10 +209,68 @@ Response* publishData(CURL* curl, const char* baseURL, const char* cID,
 	// send the request
 	Response* r = httpPost(curl, url);
 
-	// free memory no longer required
-	free(url);
-	free(pwHeader);
+	// free memory held by the header list
 	curl_slist_free_all(headers);
 
 	return r;
+}
+
+/**
+ * Construct a URL to <base>/publish/<cID>.
+ * Trailing slash on the base URL is handled appropriately.
+ * @param  base Eg. "localhost:3000".
+ * @param  cID  The channel ID.
+ * @return      A heap allocated string.
+ */
+char* createPublishURL(const char* base, const char* cID) {
+	size_t baseLen = strlen(base);
+	size_t bytes = baseLen + strlen(cID) + strlen(PUB_ENDPOINT) + 1;
+	bool trailingSlash = (base[baseLen - 1] == '/');
+
+	if (!trailingSlash) {
+		// add an extra byte because the base url does
+		// not contain a trailing slash
+		bytes += 1;
+	}
+
+	char* url = malloc(bytes);
+
+	if (!url) {
+		// out of memory
+		return NULL;
+	}
+
+	// concatenate the URL
+	strcpy(url, base);
+
+	if (!trailingSlash) {
+		// append a slash after the base URL and null terminator for strcat
+		url[baseLen] = '/';
+		url[baseLen + 1] = '\0';
+	}
+
+	strcat(url, PUB_ENDPOINT);
+	strcat(url, cID);
+
+	return url;
+}
+
+/**
+ * Creates the password header. I.e. "Channel-Password: <password>".
+ * @param  password
+ * @return          A heap allocated string.
+ */
+char* createPasswordHeader(const char* password) {
+	// one extra for null terminator
+	char* header = malloc(strlen(HEADER_CHAN_PW) + strlen(password) + 1);
+
+	if (!header) {
+		// out of memory
+		return NULL;
+	}
+
+	strcpy(header, HEADER_CHAN_PW);
+	strcat(header, password);
+
+	return header;
 }
