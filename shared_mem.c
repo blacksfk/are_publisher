@@ -63,10 +63,14 @@ SharedMem* createSharedMem() {
 }
 
 /**
- * De-allocate a shared memory struct.
+ * De-allocate a shared memory struct. Does nothing if sm is NULL.
  * @param sm
  */
 void freeSharedMem(SharedMem* sm) {
+	if (!sm) {
+		return;
+	}
+
 	free(sm->prev.hud);
 	free(sm->prev.props);
 	free(sm->prev.physics);

@@ -45,9 +45,13 @@ InstanceData* createInstanceData(
 }
 
 /**
- * Free instance data along with all heap allocated members.
+ * Free instance data along with all heap allocated members. Does nothing if data is NULL.
  */
 void freeInstanceData(InstanceData* data) {
+	if (!data) {
+		return;
+	}
+
 	free(data->address);
 	free(data->channel);
 	free(data->password);
