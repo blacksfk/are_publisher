@@ -92,13 +92,15 @@ static bool terminate() {
 
 /**
  * Frees all allocations in the procedure function.
+ * a, b, c, d, and e are expected to be heap allocated blocks
+ * release-able with free.
  */
-#define CLEANUP do {\
-	free(header);\
-	free(url);\
-	free(password);\
-	free(channel);\
-	free(address);\
+#define CLEANUP(a, b, c, d, e, curl) do {\
+	free(a);\
+	free(b);\
+	free(c);\
+	free(d);\
+	free(e);\
 	curl_easy_cleanup(curl);\
 } while(0)
 
@@ -132,7 +134,7 @@ DWORD WINAPI procedure(void* arg) {
 
 	if (!address || !channel || !password) {
 		// out of memory
-		CLEANUP;
+		CLEANUP(address, channel, password, url, header, curl);
 
 		return ARE_OUT_OF_MEM;
 	}
@@ -142,7 +144,7 @@ DWORD WINAPI procedure(void* arg) {
 
 	if (!url || !header) {
 		// out of memory
-		CLEANUP;
+		CLEANUP(address, channel, password, url, header, curl);
 
 		return ARE_OUT_OF_MEM;
 	}
@@ -263,7 +265,7 @@ DWORD WINAPI procedure(void* arg) {
 	}
 
 	// free all the mallocs
-	CLEANUP;
+	CLEANUP(address, channel, password, url, header, curl);
 
 	return exitCode;
 }
