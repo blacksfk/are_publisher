@@ -1,6 +1,37 @@
 #include "gui.h"
 
 /**
+ * Copies the input from window handlers into their respective buffers.
+ * @param  data
+ * @return      True if all buffers contain at least one byte and false otherwise.
+ */
+static bool getHandlerText(InstanceData* data) {
+	// copy the input from each handle into the respective buffer
+	// GetWindowTextW will truncate and append the the wide null terminator
+	// if the input byte count is > FORM_CTRL_BUF_SIZE - 2
+	int a = GetWindowTextW(
+		data->handlers.ctrlAddress,
+		data->address,
+		FORM_CTRL_BUF_SIZE
+	);
+
+	int c = GetWindowTextW(
+		data->handlers.ctrlChannel,
+		data->address,
+		FORM_CTRL_BUF_SIZE
+	);
+
+	int p = GetWindowTextW(
+		data->handlers.ctrlPassword,
+		data->password,
+		FORM_CTRL_BUF_SIZE
+	);
+
+	// GetWindowTextW returns the number of characters copied
+	return (a && c && p);
+}
+
+/**
  * Create the static and edit controls and bind them to the parent window.
  * @param parent
  * @param handlers
@@ -99,7 +130,7 @@ static void createForm(HWND parent, struct formHandlers* handlers) {
 	// button
 	handlers->btnToggle = CreateWindowW(
 		L"Button",
-		L"Start",
+		BTN_START,
 		FORM_BTN_STYLE,
 		MARGIN_X,
 		MARGIN_Y + FORM_GROUP_H * 3,
