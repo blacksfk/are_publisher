@@ -12,6 +12,9 @@
 // 1kB should be enough for static error messages, right?
 #define MSG_BOX_BUF_SIZE 1024
 
+// prevent MSVC from spitting out warnings about "in-secure" functions
+#pragma warning(disable:4996)
+
 // prevent winsock 1.1 from being included by windows.h in order for libcurl to
 // include winsock2.h
 #define WIN32_LEAN_AND_MEAN
@@ -82,7 +85,7 @@
 } while(0)
 
 char* wstrToStr(const wchar_t* wstr);
-char* strToWstr(const char* str);
+wchar_t* strToWstr(const char* str);
 cJSON* addWstrToObject(cJSON*, char*, const wchar_t*);
 void msgBoxErr(int e, const wchar_t* str);
 
