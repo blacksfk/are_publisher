@@ -46,7 +46,7 @@ typedef enum penaltyType {
 
 	P_DT_IGNORED_DRIVER_STINT,
 	P_DSQ_IGNORED_DRIVER_STINT,
-	P_DSQ_EXCEEDED_DRVIER_STINT
+	P_DSQ_EXCEEDED_DRIVER_STINT
 } PenaltyType;
 
 // Session type enumeration.
