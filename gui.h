@@ -6,7 +6,7 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#include "instance_data.h"
+#include "procedure.h"
 
 enum buttons {
 	BTN_TOGGLE = 1000
