@@ -159,6 +159,20 @@ static void createForm(HWND parent, struct formHandlers* handlers) {
 }
 
 /**
+ * Send a terminate message to the thread and wait for it to exit.
+ * @param thread
+ * @param threadId
+ */
+static void terminateThread(HANDLE thread, DWORD threadId) {
+	// stop the running thread by sending it a WM_QUIT message
+	PostThreadMessageW(threadId, WM_QUIT, 0, 0);
+
+	// wait until the thread terminates
+	// TODO: handle thread not terminating after a period of time
+	WaitForSingleObject(thread, INFINITE);
+}
+
+/**
  * Handles WM_CREATE.
  */
 static LRESULT wmCreate(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
@@ -186,7 +200,7 @@ static LRESULT wmPaint(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 	PAINTSTRUCT ps;
 	HDC hdc = BeginPaint(wnd, &ps);
 
-	FillRect(hdc, &ps.rcPaint, (HBRUSH) COLOR_WINDOW + 1);
+	FillRect(hdc, &ps.rcPaint, (HBRUSH) (COLOR_WINDOW + 1));
 	EndPaint(wnd, &ps);
 
 	return 0;
@@ -240,12 +254,7 @@ static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 		// change the text of the button to "Stop"
 		SetWindowTextW(btn, BTN_STOP);
 	} else {
-		// stop the running thread by sending it a WM_QUIT message
-		PostThreadMessageW(data->threadId, WM_QUIT, 0, 0);
-
-		// wait until the thread terminates
-		// TODO: handle thread not terminating after a period of time
-		WaitForSingleObject(data->thread, INFINITE);
+		terminateThread(data->thread, data->threadId);
 
 		// change the text of the button to "Start"
 		SetWindowTextW(btn, BTN_START);
@@ -268,6 +277,11 @@ static LRESULT wmDestroy(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 
 	// extract struct from the window user data
 	InstanceData* data = (InstanceData*) GetWindowLongPtr(wnd, GWLP_USERDATA);
+
+	if (data->running) {
+		// thread is running so kill it
+		terminateThread(data->thread, data->threadId);
+	}
 
 	// run the cleanup function to release held resources
 	data->cleanup(data);
