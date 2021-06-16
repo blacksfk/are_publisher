@@ -196,7 +196,65 @@ static LRESULT wmPaint(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
  * Handles WM_COMMAND.
  */
 static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
-	// TODO
+	if (w != BTN_TOGGLE) {
+		// something else was clicked; let windows handle it
+		return DefWindowProcW(wnd, msg, w, l);
+	}
+
+	// extract the struct from the window user data
+	InstanceData* data = (InstanceData*) GetWindowLongPtr(wnd, GWLP_USERDATA);
+	HWND btn = data->handlers.btnToggle;
+
+	// disable the button until the toggle operation has completed
+	EnableWindow(btn, false);
+
+	// toggle the state of the program
+	if (!data->running) {
+		// copy text into input buffers
+		if (!getHandlerText(data)) {
+			EnableWindow(btn, true);
+			msgBoxErr(ARE_USER_INPUT, L"Invalid input");
+
+			return 0;
+		}
+
+		// TODO: validate input
+
+		// create a thread
+		data->thread = CreateThread(
+			NULL,           // default security attributes
+			0,              // default stack size
+			&procedure,     // the function
+			data,           // function args
+			0,              // start the thread immediately
+			&data->threadId // thread id
+		);
+
+		if (!data->thread) {
+			EnableWindow(btn, true);
+			msgBoxErr(ARE_THREAD, L"Failed to create thread");
+
+			return 0;
+		}
+
+		// change the text of the button to "Stop"
+		SetWindowTextW(btn, BTN_STOP);
+	} else {
+		// stop the running thread by sending it a WM_QUIT message
+		PostThreadMessageW(data->threadId, WM_QUIT, 0, 0);
+
+		// wait until the thread terminates
+		// TODO: handle thread not terminating after a period of time
+		WaitForSingleObject(data->thread, INFINITE);
+
+		// change the text of the button to "Start"
+		SetWindowTextW(btn, BTN_START);
+	}
+
+	// re-enable the button and toggle the state
+	EnableWindow(btn, true);
+	data->running = !data->running;
+
 	return 0;
 }
 
