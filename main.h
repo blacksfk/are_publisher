@@ -4,6 +4,5 @@
 #include "gui.h"
 
 void attachTerm();
-void release(InstanceData* data);
 
 #endif

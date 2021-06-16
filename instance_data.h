@@ -40,16 +40,9 @@ typedef struct instanceData {
 
 	// as described above
 	struct formHandlers handlers;
-
-	// function to run once WM_DESTROY is received
-	// should free allocated resources etc.
-	// must call freeInstanceData once other cleanup tasks are complete
-	void (*cleanup)(struct instanceData*);
 } InstanceData;
 
-InstanceData* createInstanceData(
-	SharedMem* sm, void (*cleanup)(struct instanceData*)
-);
+InstanceData* createInstanceData(SharedMem* sm);
 void freeInstanceData(InstanceData* data);
 
 #endif

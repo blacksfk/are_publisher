@@ -2,12 +2,10 @@
 
 /**
  * Allocate memory for an instance data struct and initialise various members.
- * @param  curl
- * @return      Returns NULL if memory could not be allocated.
+ * @param  sm
+ * @return    Returns NULL if memory could not be allocated.
  */
-InstanceData* createInstanceData(
-	SharedMem* sm, void (*cleanup)(struct instanceData*)
-) {
+InstanceData* createInstanceData(SharedMem* sm) {
 	InstanceData* data = malloc(sizeof(*data));
 
 	if (!data) {
@@ -37,7 +35,6 @@ InstanceData* createInstanceData(
 
 	data->sm = sm;
 	data->running = false;
-	data->cleanup = cleanup;
 	data->thread = NULL;
 	data->threadId = 0;
 

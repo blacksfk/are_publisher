@@ -25,7 +25,7 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 	}
 
 	// initialise data tied to the UI (input buffers and handlers)
-	InstanceData* data = createInstanceData(sm, &release);
+	InstanceData* data = createInstanceData(sm);
 
 	if (!data) {
 		curl_global_cleanup();
@@ -59,15 +59,4 @@ void attachTerm() {
 	freopen("CONIN$", "r", stdin);
 	freopen("CONOUT$", "w", stdout);
 	freopen("CONOUT$", "w", stderr);
-}
-
-/**
- * Free allocated resources for curl, shared memory, and instance data objects.
- * Implements cleanupFunc.
- * @param data
- */
-void release(InstanceData* data) {
-	curl_global_cleanup();
-	freeSharedMem(data->sm);
-	freeInstanceData(data);
 }

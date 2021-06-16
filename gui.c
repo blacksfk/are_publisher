@@ -283,9 +283,6 @@ static LRESULT wmDestroy(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 		terminateThread(data->thread, data->threadId);
 	}
 
-	// run the cleanup function to release held resources
-	data->cleanup(data);
-
 	// signal the loop to exit
 	PostQuitMessage(0);
 
