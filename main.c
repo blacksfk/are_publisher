@@ -9,10 +9,18 @@
 	freeInstanceData(d);\
 } while(0)
 
+/**
+ * WIN32 API entry point.
+ */
 int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) {
 	// discard prev instance (always NULL) and command line args
 	(void) prev;
 	(void) args;
+
+#ifdef DEBUG
+	// debug flag defined so create a terminal for I/O
+	attachTerm();
+#endif
 
 	// initialise curl globally
 	CURLcode cc = curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -54,6 +62,12 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 
 		return EXIT_FAILURE;
 	}
+
+#ifdef DEBUG
+	// debug defined so don't exit until the user requests it
+	wprintf(L"Press enter to exit...\n");
+	fgetwc(stdin);
+#endif
 
 	return EXIT_SUCCESS;
 }

@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
+# compile time flags
+option(DEBUG "Enable logging for debugging purposes" ON)
+configure_file(config.h.in config.h)
+
 # project name
 project(are_publisher)
 
@@ -26,4 +30,5 @@ add_executable(
 	main.c
 	shared_mem.c
 )
+target_include_directories(are_publisher PUBLIC ${PROJECT_BINARY_DIR})
 target_link_libraries(are_publisher ${CONAN_LIBS})
