@@ -15,7 +15,8 @@ MSVC defaults to building for a debug environment so building for production req
 `cmake --build .`
 
 ### Production
-`cmake --build . -D DEBUG=OFF --config Release`
+1. `cmake .. -D DEBUG=OFF`
+2. MSVC is a multi-environment compiler and therefore cmake requires an extra flag at build time: `cmake --build . --config Release`
 
 ## Licence
 BSD-3-Clause
