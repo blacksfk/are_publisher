@@ -8,7 +8,9 @@ enum areError {
 	ARE_CURL,
 	ARE_REQ,
 	ARE_DURATION,
-	ARE_GUI
+	ARE_GUI,
+	ARE_USER_INPUT,
+	ARE_THREAD
 };
 
 #endif
