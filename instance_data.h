@@ -32,6 +32,12 @@ typedef struct instanceData {
 	// shared memory object
 	SharedMem* sm;
 
+	// processing thread handle
+	HANDLE thread;
+
+	// processing thread identifier
+	DWORD threadId;
+
 	// as described above
 	struct formHandlers handlers;
 

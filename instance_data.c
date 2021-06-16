@@ -38,6 +38,8 @@ InstanceData* createInstanceData(
 	data->sm = sm;
 	data->running = false;
 	data->cleanup = cleanup;
+	data->thread = NULL;
+	data->threadId = 0;
 
 	return data;
 }
