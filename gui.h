@@ -15,6 +15,9 @@ enum buttons {
 #define WINDOW_CLASS L"are_publisher_class"
 #define WINDOW_TITLE L"ACC Race Engineer"
 
+#define BTN_START L"Start"
+#define BTN_STOP L"Stop"
+
 // main window width and height
 #define WINDOW_W 500
 #define WINDOW_H 220
@@ -45,7 +48,6 @@ enum buttons {
 #define FORM_LBL_STYLE (WS_VISIBLE | WS_CHILD | SS_SIMPLE)
 #define FORM_CTRL_STYLE (WS_VISIBLE | WS_CHILD | WS_BORDER | ES_AUTOHSCROLL)
 #define FORM_BTN_STYLE (WS_VISIBLE | WS_CHILD | BS_CENTER)
-#define FORM_BTN_HIDDEN_STYLE (WS_CHILD | BS_CENTER)
 
 bool gui(HINSTANCE h, int cmdShow, InstanceData* data);
 
