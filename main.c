@@ -1,5 +1,14 @@
 #include "main.h"
 
+/**
+ * Free allocations by curl, shared memory, and instance data.
+ */
+#define CLEANUP(s, d) do {\
+	curl_global_cleanup();\
+	freeSharedMem(s);\
+	freeInstanceData(d);\
+} while(0)
+
 int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) {
 	// discard prev instance (always NULL) and command line args
 	(void) prev;
@@ -18,7 +27,7 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 	SharedMem* sm = createSharedMem();
 
 	if (!sm) {
-		curl_global_cleanup();
+		CLEANUP(NULL, NULL);
 		msgBoxErr(ARE_SHARED_MEM_INIT, L"Shared memory initialisation failed");
 
 		return EXIT_FAILURE;
@@ -28,8 +37,7 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 	InstanceData* data = createInstanceData(sm);
 
 	if (!data) {
-		curl_global_cleanup();
-		freeSharedMem(sm);
+		CLEANUP(sm, NULL);
 		msgBoxErr(ARE_OUT_OF_MEM, L"Out of memory");
 
 		return EXIT_FAILURE;
@@ -37,6 +45,9 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 
 	// create and run the GUI
 	bool success = gui(curr, cmdShow, data);
+
+	// program terminating
+	CLEANUP(sm, data);
 
 	if (!success) {
 		msgBoxErr(ARE_GUI, L"Failed to create window");
