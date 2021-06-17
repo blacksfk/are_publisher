@@ -1,5 +1,83 @@
 #include "procedure.h"
 
+// groups the url, password header, and curl handler
+struct attributes {
+	char* url;
+	CURL* curl;
+	char* header;
+};
+
+/**
+ * Free memory allocated for the url, header, and curl.
+ */
+static void freeAttributes(struct attributes a) {
+	free(a.url);
+	free(a.header);
+	curl_easy_cleanup(a.curl);
+}
+
+/**
+ * Free memory allocated for the temporary strings used in initAttributes.
+ */
+#define ATTR_CLEANUP(a, b, c) do {\
+	free(a);\
+	free(b);\
+	free(c);\
+} while(0)
+
+/**
+ * Creates a message queue, URL and header strings, and a curl easy handle.
+ * @param  a
+ * @param  data
+ * @return      A non-zero code if an error occurs, zero otherwise.
+ */
+static DWORD initAttributes(struct attributes* a, InstanceData* data) {
+	// initialise all members to NULL
+	a->url = a->curl = a->header = NULL;
+
+	// force initialisation of the message queue
+	MSG msg;
+
+	PeekMessageW(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
+
+	// create a curl easy handle
+	CURL* curl = curl_easy_init();
+
+	if (!curl) {
+		return ARE_CURL;
+	}
+
+	// convert the wide char buffers into char buffers
+	char* address = wstrToStr(data->address);
+	char* channel = wstrToStr(data->channel);
+	char* password = wstrToStr(data->password);
+
+	if (!address || !channel || !password) {
+		// out of memory
+		freeAttributes(*a);
+		ATTR_CLEANUP(address, channel, password);
+
+		return ARE_OUT_OF_MEM;
+	}
+
+	// create the url and password header strings
+	a->url = createPublishURL(address, channel);
+	a->header = createPasswordHeader(password);
+
+	// temporary strings no longer required
+	ATTR_CLEANUP(address, channel, password);
+
+	if (!a->url || !a->header) {
+		// out of memory
+		freeAttributes(*a);
+
+		return ARE_OUT_OF_MEM;
+	}
+
+	// initialised successfully
+	return 0;
+}
+
 /**
  * Convert the data in the memory maps to a non-formatted JSON
  * string and handle associated errors.
@@ -91,18 +169,64 @@ static bool terminate() {
 }
 
 /**
- * Frees all allocations in the procedure function.
- * a, b, c, d, and e are expected to be heap allocated blocks
- * release-able with free.
+ * Push a JSON data packet to the server.
+ * @param  a
+ * @param  json free'd once sent.
+ * @return      Non-zero error code on failure, zero otherwise.
  */
-#define CLEANUP(a, b, c, d, e, curl) do {\
-	free(a);\
-	free(b);\
-	free(c);\
-	free(d);\
-	free(e);\
-	curl_easy_cleanup(curl);\
-} while(0)
+static DWORD push(struct attributes a, char* json) {
+	// push the JSON string to the server
+	Response* res = publishData(a.curl, a.url, a.header, json);
+
+	// once sent the json string is no longer required
+	free(json);
+
+	if (!res) {
+		// out of memory
+		return ARE_OUT_OF_MEM;
+	}
+
+	// check for a curl error
+	if (res->curlCode != 0) {
+		// programmer error with libcurl (most likely)
+		wchar_t* error = strToWstr(curl_easy_strerror(res->curlCode));
+
+		if (!error) {
+			// out of memory
+			return ARE_OUT_OF_MEM;
+		}
+
+		msgBoxErr(ARE_CURL, error);
+		free(error);
+
+		return ARE_CURL;
+	}
+
+	// check for a request or server error
+	if (res->status >= 400) {
+		// something is fundamentally wrong with either:
+		// (a) the request or
+		// (b) the server
+		// in either case it is best to terminate because (a) will
+		// require re-compilation and (b) requires server maintainence
+		wchar_t* error = strToWstr(res->body->data);
+
+		if (!error) {
+			// out of memory
+			return ARE_OUT_OF_MEM;
+		}
+
+		msgBoxErr(ARE_REQ, error);
+		free(error);
+
+		return ARE_REQ;
+	}
+
+	// response no longer required
+	free(res);
+
+	return 0;
+}
 
 /**
  * Main loop. Implements ThreadProc.
@@ -110,72 +234,22 @@ static bool terminate() {
  * @return     0 on success, an error code defined in error.h otherwise.
  */
 DWORD WINAPI procedure(void* arg) {
-	MSG msg;
-
-	// initialise the message queue (used for thread termination)
-	PeekMessageW(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
-
-	// initialise a curl easy handle
-	CURL* curl = curl_easy_init();
-
-	if (!curl) {
-		return ARE_CURL;
-	}
-
-	// cast to an instance data pointer
+	struct attributes attr;
 	InstanceData* data = (InstanceData*) arg;
 
-	// convert each wide string to a multi-byte string for use with curl
-	char* address = wstrToStr(data->address);
-	char* channel = wstrToStr(data->channel);
-	char* password = wstrToStr(data->password);
-	char* url = NULL;
-	char* header = NULL;
+	// init message queue, curl, and necessary strings
+	DWORD result = initAttributes(&attr, data);
 
-	if (!address || !channel || !password) {
-		// out of memory
-		CLEANUP(address, channel, password, url, header, curl);
-
-		return ARE_OUT_OF_MEM;
+	if (result != 0) {
+		// initialisation failed
+		return result;
 	}
 
-	url = createPublishURL(address, channel);
-	header = createPasswordHeader(password);
-
-	if (!url || !header) {
-		// out of memory
-		CLEANUP(address, channel, password, url, header, curl);
-
-		return ARE_OUT_OF_MEM;
-	}
-
-	int exitCode = 0;
-	bool exit = false;
-
-	while (true) {
-		// wait until the player is in the car or
-		// this thread is asked to terminate
-		while (true) {
-			// check if a session has been initialised and the player is
-			// in the car
-			if (data->sm->curr.hud->status == STATUS_LIVE) {
-				break;
-			}
-
-			// check the message queue for termination
-			exit = terminate();
-
-			if (exit) {
-				break;
-			}
-
-			// sleep thread and check again in >= SLEEP_DURATION
+	while (!terminate()) {
+		if (data->sm->curr.hud->status != STATUS_LIVE) {
+			// wait until the player is in the car
 			Sleep(SLEEP_DURATION);
-		}
-
-		if (exit) {
-			// parent thread has requested termination
-			break;
+			continue;
 		}
 
 		// get a time stamp to measure the length of the process
@@ -191,62 +265,16 @@ DWORD WINAPI procedure(void* arg) {
 
 		if (!json) {
 			// out of memory
-			exitCode = ARE_OUT_OF_MEM;
-			break;
+			return ARE_OUT_OF_MEM;
 		}
 
-		// push the JSON string to the server
-		Response* res = publishData(curl, url, header, json);
+		// send the json to the server
+		result = push(attr, json);
 
-		// once sent the json string is no longer required
-		free(json);
-
-		if (!res) {
-			// out of memory
-			exitCode = ARE_OUT_OF_MEM;
-			break;
+		if (result != 0) {
+			// something went wrong with curl or no memory
+			return result;
 		}
-
-		// check for a curl error
-		if (res->curlCode != 0) {
-			// programmer error with libcurl (most likely)
-			wchar_t* error = strToWstr(curl_easy_strerror(res->curlCode));
-
-			if (!error) {
-				// out of memory
-				exitCode = ARE_OUT_OF_MEM;
-			} else {
-				msgBoxErr(ARE_CURL, error);
-				exitCode = ARE_CURL;
-				free(error);
-			}
-
-			break;
-		}
-
-		// check for a request or server error
-		if (res->status >= 400) {
-			// something is fundamentally wrong with either:
-			// (a) the request or
-			// (b) the server
-			// in either case it is best to terminate because (a) will
-			// require re-compilation and (b) requires server maintainence
-			wchar_t* error = strToWstr(res->body->data);
-
-			if (!error) {
-				// out of memory
-				exitCode = ARE_OUT_OF_MEM;
-			} else {
-				msgBoxErr(ARE_REQ, error);
-				exitCode = ARE_REQ;
-				free(error);
-			}
-
-			break;
-		}
-
-		// response no longer required
-		free(res);
 
 		// copy the current frame's data to the previous frame
 		sharedMemCurrToPrev(data->sm);
@@ -265,7 +293,7 @@ DWORD WINAPI procedure(void* arg) {
 	}
 
 	// free all the mallocs
-	CLEANUP(address, channel, password, url, header, curl);
+	freeAttributes(attr);
 
-	return exitCode;
+	return 0;
 }
