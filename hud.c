@@ -488,3 +488,23 @@ cJSON* hudToJSON(const HUD* curr, const HUD* prev) {
 
 	return obj;
 }
+
+/**
+ * Get a status as a wchar_t*.
+ * @param  s
+ * @return   No need to free.
+ */
+const wchar_t* wstrStatus(Status s) {
+	switch (s) {
+	case STATUS_OFF:
+		return L"ACC not running or not in session";
+	case STATUS_REPLAY:
+		return L"Watching replay";
+	case STATUS_LIVE:
+		return L"In car";
+	case STATUS_PAUSE:
+		return L"Paused";
+	}
+
+	return L"Unknown";
+}

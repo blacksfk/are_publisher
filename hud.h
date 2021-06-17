@@ -333,5 +333,6 @@ typedef struct hud {
 } HUD;
 
 cJSON* hudToJSON(const HUD*, const HUD*);
+const wchar_t* wstrStatus(Status);
 
 #endif
