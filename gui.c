@@ -33,10 +33,13 @@ static bool getHandlerText(InstanceData* data) {
 
 /**
  * Create the static and edit controls and bind them to the parent window.
- * @param parent
- * @param handlers
+ * @param  parent   Used as hWndParent argument to CreateWindow.
+ * @param  handlers Members are set to their respective window handlers.
+ * @param  status   Initial text of the status label.
+ * @return          True if all windows were created and false otherwise.
  */
-static void createForm(HWND parent, struct formHandlers* handlers) {
+static bool createControls(HWND parent, struct formHandlers* handlers,
+							const wchar_t* status) {
 	// server address label
 	handlers->lblAddress = CreateWindowW(
 		L"Static",
@@ -145,7 +148,7 @@ static void createForm(HWND parent, struct formHandlers* handlers) {
 	// status label
 	handlers->lblStatus = CreateWindowW(
 		L"Static",
-		L"Status: ",
+		status,
 		FORM_LBL_STYLE,
 		MARGIN_X,
 		MARGIN_Y + (FORM_GROUP_H * 3) + FORM_BTN_H + FORM_MARGIN_H,
@@ -155,6 +158,19 @@ static void createForm(HWND parent, struct formHandlers* handlers) {
 		NULL,
 		NULL,
 		NULL
+	);
+
+	// return true if all of the windows were created successfully
+	// and false otherwise
+	return (
+		handlers->lblAddress &&
+		handlers->lblChannel &&
+		handlers->lblPassword &&
+		handlers->lblStatus &&
+		handlers->ctrlAddress &&
+		handlers->ctrlChannel &&
+		handlers->ctrlPassword &&
+		handlers->btnToggle
 	);
 }
 
@@ -374,7 +390,10 @@ bool gui(HINSTANCE h, int cmdShow, InstanceData* data) {
 	}
 
 	// create and add the form controls to the main window
-	createForm(wnd, &data->handlers);
+	if (!createControls(wnd, &data->handlers, wstrStatus(data->sm->curr.hud->status))) {
+		// failed to create controls
+		return false;
+	}
 
 	// show the window
 	ShowWindow(wnd, cmdShow);
