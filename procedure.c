@@ -196,7 +196,7 @@ static DWORD push(struct attributes a, char* json) {
 			return ARE_OUT_OF_MEM;
 		}
 
-		msgBoxErr(ARE_CURL, error);
+		msgBoxErr(NULL, ARE_CURL, error);
 		free(error);
 
 		return ARE_CURL;
@@ -216,7 +216,7 @@ static DWORD push(struct attributes a, char* json) {
 			return ARE_OUT_OF_MEM;
 		}
 
-		msgBoxErr(ARE_REQ, error);
+		msgBoxErr(NULL, ARE_REQ, error);
 		free(error);
 
 		return ARE_REQ;

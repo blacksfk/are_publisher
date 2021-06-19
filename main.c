@@ -26,7 +26,7 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 	CURLcode cc = curl_global_init(CURL_GLOBAL_DEFAULT);
 
 	if (cc != 0) {
-		msgBoxErr(ARE_CURL, L"Curl global initialisation failed");
+		msgBoxErr(NULL, ARE_CURL, L"Curl global initialisation failed");
 
 		return EXIT_FAILURE;
 	}
@@ -36,7 +36,7 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 
 	if (!sm) {
 		CLEANUP(NULL, NULL);
-		msgBoxErr(ARE_SHARED_MEM_INIT, L"Shared memory initialisation failed");
+		msgBoxErr(NULL, ARE_SHARED_MEM_INIT, L"Shared memory initialisation failed");
 
 		return EXIT_FAILURE;
 	}
@@ -46,7 +46,7 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 
 	if (!data) {
 		CLEANUP(sm, NULL);
-		msgBoxErr(ARE_OUT_OF_MEM, L"Out of memory");
+		msgBoxErr(NULL, ARE_OUT_OF_MEM, L"Out of memory");
 
 		return EXIT_FAILURE;
 	}

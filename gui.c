@@ -243,7 +243,7 @@ static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 		// copy text into input buffers
 		if (!getHandlerText(data)) {
 			EnableWindow(btn, true);
-			msgBoxErr(ARE_USER_INPUT, L"Invalid input");
+			msgBoxErr(NULL, ARE_USER_INPUT, L"All fields are required");
 
 			return 0;
 		}
@@ -262,7 +262,7 @@ static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 
 		if (!data->thread) {
 			EnableWindow(btn, true);
-			msgBoxErr(ARE_THREAD, L"Failed to create thread");
+			msgBoxErr(wnd, ARE_THREAD, L"Failed to create thread");
 
 			return 0;
 		}
@@ -412,7 +412,7 @@ static int dispatch(HWND wnd, MSG* msg) {
 	}
 
 	// an error occurred
-	msgBoxErr((int) GetLastError(), L"GetMessageFailed");
+	msgBoxErr(wnd, (int) GetLastError(), L"GetMessageFailed");
 
 	return -1;
 }
@@ -420,15 +420,15 @@ static int dispatch(HWND wnd, MSG* msg) {
 /**
  * Show an error message box if the thread exited early.
  */
-static void threadError(InstanceData* data) {
+static void threadError(HWND wnd, InstanceData* data) {
 	DWORD code = 0;
 
 	data->running = false;
 
 	if (!GetExitCodeThread(data->thread, &code)) {
-		msgBoxErr(ARE_THREAD, L"GetExitCodeThread failed");
+		msgBoxErr(wnd, ARE_THREAD, L"GetExitCodeThread failed");
 	} else {
-		msgBoxErr((int) code, L"Thread exited early");
+		msgBoxErr(wnd, (int) code, L"Thread exited early");
 	}
 }
 
@@ -436,12 +436,12 @@ static void threadError(InstanceData* data) {
  * Update the text of the status label. Returns -1 if an error occurred
  * and 0 otherwise.
  */
-static int updateStatusLabel(InstanceData* data) {
+static int updateStatusLabel(HWND wnd, InstanceData* data) {
 	HWND label = data->handlers.lblStatus;
 	const wchar_t* status = wstrStatus(data->sm->curr.hud->status);
 
 	if (!SetWindowTextW(label, status)) {
-		msgBoxErr((int) GetLastError(), L"Failed to update status label");
+		msgBoxErr(wnd, (int) GetLastError(), L"Failed to update status label");
 
 		return -1;
 	}
@@ -487,7 +487,7 @@ static void messageLoop(HWND wnd, InstanceData* data) {
 				// WAIT_OBJECT_0 is returned when the thread
 				// has been signalled
 				// thread exited early due to an error
-				threadError(data);
+				threadError(wnd, data);
 				result = -1;
 			}
 
@@ -499,7 +499,7 @@ static void messageLoop(HWND wnd, InstanceData* data) {
 		case WAIT_TIMEOUT:
 			// timeout reached
 			// use this opportunity to update the status label
-			result = updateStatusLabel(data);
+			result = updateStatusLabel(wnd, data);
 			break;
 		default:
 			// WAIT_ABANDONED_0 to WAIT_ABANDONED_0 + handle count is only
@@ -507,7 +507,7 @@ static void messageLoop(HWND wnd, InstanceData* data) {
 			// handled here.
 			// Only WAIT_FAILED should trigger this code path
 			result = -1;
-			msgBoxErr((int) GetLastError(), L"MsgWaitForMultipleObjects failed");
+			msgBoxErr(wnd, (int) GetLastError(), L"MsgWaitForMultipleObjects failed");
 		}
 	} while (result == 0);
 
@@ -526,14 +526,14 @@ void gui(HINSTANCE h, int cmdShow, InstanceData* data) {
 	HWND wnd = init(h, data);
 
 	if (!wnd) {
-		msgBoxErr(ARE_GUI, L"Failed to create window");
+		msgBoxErr(NULL, ARE_GUI, L"Failed to create window");
 
 		return;
 	}
 
 	// create and add the form controls to the main window
 	if (!createControls(wnd, &data->handlers, wstrStatus(data->sm->curr.hud->status))) {
-		msgBoxErr(ARE_GUI, L"Failed to create window controls");
+		msgBoxErr(NULL, ARE_GUI, L"Failed to create window controls");
 
 		return;
 	}

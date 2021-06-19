@@ -88,6 +88,6 @@
 char* wstrToStr(const wchar_t* wstr);
 wchar_t* strToWstr(const char* str);
 cJSON* addWstrToObject(cJSON*, char*, const wchar_t*);
-void msgBoxErr(int e, const wchar_t* str);
+void msgBoxErr(HWND parent, int e, const wchar_t* str);
 
 #endif

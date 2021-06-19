@@ -70,9 +70,9 @@ cJSON* addWstrToObject(cJSON* obj, char* key, const wchar_t* wstr) {
  * @param e   The error code.
  * @param str The error message.
  */
-void msgBoxErr(int e, const wchar_t* str) {
+void msgBoxErr(HWND parent, int e, const wchar_t* str) {
 	wchar_t msg[MSG_BOX_BUF_SIZE];
 
 	swprintf(msg, MSG_BOX_BUF_SIZE, L"%d: %ls.", e, str);
-	MessageBoxW(NULL, msg, L"Error", MB_OK);
+	MessageBoxW(parent, msg, L"Error", MB_OK | MB_ICONERROR);
 }
