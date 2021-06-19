@@ -394,6 +394,12 @@ static int dispatch(HWND wnd, MSG* msg) {
 	// According to MS, a boolean has 3 states
 	int result = GetMessageW(msg, wnd, 0, 0);
 
+	// check if the message is a dialog message in order
+	// to provide keyboard TAB functionality
+	if (IsDialogMessageW(wnd, msg)) {
+		return 0;
+	}
+
 	if (result > 0) {
 		// message received; dispatch and process it
 		TranslateMessage(msg);
