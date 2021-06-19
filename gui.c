@@ -223,6 +223,23 @@ static LRESULT wmPaint(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 }
 
 /**
+ * Handles WM_CTLCOLORSTATIC. Sets the background of static controls to be
+ * transparent.
+ */
+static LRESULT wmCtlColorStatic(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+	(void) wnd;
+	(void) msg;
+	(void) l;
+
+	HDC ctrl = (HDC) w;
+
+	// set the background colour to transparent
+	SetBkMode(ctrl, TRANSPARENT);
+
+	return (LRESULT) GetSysColorBrush(TRANSPARENT);
+}
+
+/**
  * Handles WM_COMMAND.
  */
 static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
@@ -314,6 +331,8 @@ static LRESULT CALLBACK windowProcess(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 		return wmCreate(wnd, msg, w, l);
 	case WM_PAINT:
 		return wmPaint(wnd, msg, w, l);
+	case WM_CTLCOLORSTATIC:
+		return wmCtlColorStatic(wnd, msg, w, l);
 	case WM_COMMAND:
 		return wmCommand(wnd, msg, w, l);
 	case WM_DESTROY:
