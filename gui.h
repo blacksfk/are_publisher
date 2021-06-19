@@ -49,6 +49,6 @@ enum buttons {
 #define FORM_CTRL_STYLE (WS_VISIBLE | WS_CHILD | WS_BORDER | ES_AUTOHSCROLL)
 #define FORM_BTN_STYLE (WS_VISIBLE | WS_CHILD | BS_CENTER)
 
-bool gui(HINSTANCE h, int cmdShow, InstanceData* data);
+void gui(HINSTANCE h, int cmdShow, InstanceData* data);
 
 #endif

@@ -52,16 +52,8 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 	}
 
 	// create and run the GUI
-	bool success = gui(curr, cmdShow, data);
-
-	// program terminating
+	gui(curr, cmdShow, data);
 	CLEANUP(sm, data);
-
-	if (!success) {
-		msgBoxErr(ARE_GUI, L"Failed to create window");
-
-		return EXIT_FAILURE;
-	}
 
 #ifdef DEBUG
 	// debug defined so don't exit until the user requests it

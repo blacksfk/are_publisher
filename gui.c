@@ -324,6 +324,37 @@ static LRESULT CALLBACK windowProcess(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 }
 
 /**
+ * Register and create the window.
+ * @param  h
+ * @param  data
+ * @return      NULL if CreateWindowW failed.
+ */
+static HWND init(HINSTANCE h, InstanceData* data) {
+	WNDCLASSW wc = {
+		.lpfnWndProc = &windowProcess,
+		.hInstance = h,
+		.lpszClassName = WINDOW_CLASS
+	};
+
+	RegisterClassW(&wc);
+
+	// create main window
+	return CreateWindowW(
+		WINDOW_CLASS,
+		WINDOW_TITLE,
+		WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		WINDOW_W,
+		WINDOW_H,
+		NULL,
+		NULL,
+		h,
+		data
+	);
+}
+
+/**
  * EnumChildWindows callback. Sends WM_SETFONT for each child window recursively.
  * @param  wnd
  * @param  l
@@ -355,44 +386,150 @@ static void setFont(HWND wnd) {
 }
 
 /**
+ * Dispatch messages to the window process. Returns 0 if a message was received
+ * that isn't WM_QUIT, 1 if WM_QUIT was received, and -1 if an error occurred.
+ */
+static int dispatch(HWND wnd, MSG* msg) {
+	// GetMessage doesn't return a bool if it can return -1.
+	// According to MS, a boolean has 3 states
+	int result = GetMessageW(msg, wnd, 0, 0);
+
+	if (result > 0) {
+		// message received; dispatch and process it
+		TranslateMessage(msg);
+		DispatchMessage(msg);
+
+		return 0;
+	} else if (result == 0) {
+		// WM_QUIT
+		return 1;
+	}
+
+	// an error occurred
+	msgBoxErr((int) GetLastError(), L"GetMessageFailed");
+
+	return -1;
+}
+
+/**
+ * Show an error message box if the thread exited early.
+ */
+static void threadError(InstanceData* data) {
+	DWORD code = 0;
+
+	data->running = false;
+
+	if (!GetExitCodeThread(data->thread, &code)) {
+		msgBoxErr(ARE_THREAD, L"GetExitCodeThread failed");
+	} else {
+		msgBoxErr((int) code, L"Thread exited early");
+	}
+}
+
+/**
+ * Update the text of the status label. Returns -1 if an error occurred
+ * and 0 otherwise.
+ */
+static int updateStatusLabel(InstanceData* data) {
+	HWND label = data->handlers.lblStatus;
+	const wchar_t* status = wstrStatus(data->sm->curr.hud->status);
+
+	if (!SetWindowTextW(label, status)) {
+		msgBoxErr((int) GetLastError(), L"Failed to update status label");
+
+		return -1;
+	}
+
+	return 0;
+}
+
+/**
+ * Message and thread handling loop.
+ */
+static void messageLoop(HWND wnd, InstanceData* data) {
+	// result is used to determine the current state
+	// -1: an error occurred
+	// 0: all good, continue processing messages
+	// 1: clean exit (user requested termination)
+	int result;
+	MSG msg;
+
+	do {
+		DWORD waitResult = MsgWaitForMultipleObjectsEx(
+			// number of handles in the array below
+			// hack: only wait for thread when it's running
+			data->running,
+			// the handles array
+			&data->thread,
+			// how long to wait before returning in milliseconds
+			SLEEP_DURATION,
+			// message event type
+			QS_ALLEVENTS,
+			// return as soon as the thread is signalled
+			0
+		);
+
+		switch (waitResult) {
+		case WAIT_OBJECT_0:
+			if (!data->running) {
+				// when data->running is false (i.e. 0)
+				// WAIT_OBJECT_0 is returned when a message
+				// should be processed
+				result = dispatch(wnd, &msg);
+			} else {
+				// when data->running is true (i.e. 1)
+				// WAIT_OBJECT_0 is returned when the thread
+				// has been signalled
+				// thread exited early due to an error
+				threadError(data);
+				result = -1;
+			}
+
+			break;
+		case WAIT_OBJECT_0 + 1:
+			// message received when the thread is running
+			result = dispatch(wnd, &msg);
+			break;
+		case WAIT_TIMEOUT:
+			// timeout reached
+			// use this opportunity to update the status label
+			result = updateStatusLabel(data);
+			break;
+		default:
+			// WAIT_ABANDONED_0 to WAIT_ABANDONED_0 + handle count is only
+			// ever returned with mutex objects so does not need to be
+			// handled here.
+			// Only WAIT_FAILED should trigger this code path
+			result = -1;
+			msgBoxErr((int) GetLastError(), L"MsgWaitForMultipleObjects failed");
+		}
+	} while (result == 0);
+
+	if (result != 1) {
+		// error occurred; destroy the window
+		DestroyWindow(wnd);
+	}
+}
+
+/**
  * Initialise, create, and dispatch messages to the main window.
  * @param  h
  * @param  cmdShow
- * @return         Returns false if the window could not be created and true otherwise.
  */
-bool gui(HINSTANCE h, int cmdShow, InstanceData* data) {
-	const wchar_t* class = WINDOW_CLASS;
-	WNDCLASSW wc = {
-		.lpfnWndProc = &windowProcess,
-		.hInstance = h,
-		.lpszClassName = class
-	};
-
-	RegisterClassW(&wc);
-
-	// create main window
-	HWND wnd = CreateWindowW(
-		class,
-		WINDOW_TITLE,
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		WINDOW_W,
-		WINDOW_H,
-		NULL,
-		NULL,
-		h,
-		data
-	);
+void gui(HINSTANCE h, int cmdShow, InstanceData* data) {
+	HWND wnd = init(h, data);
 
 	if (!wnd) {
-		return false;
+		msgBoxErr(ARE_GUI, L"Failed to create window");
+
+		return;
 	}
 
 	// create and add the form controls to the main window
 	if (!createControls(wnd, &data->handlers, wstrStatus(data->sm->curr.hud->status))) {
-		// failed to create controls
-		return false;
+		msgBoxErr(ARE_GUI, L"Failed to create window controls");
+
+		return;
 	}
 
 	// show the window
@@ -401,12 +538,6 @@ bool gui(HINSTANCE h, int cmdShow, InstanceData* data) {
 	// set the font of the main window and its children to the default system font
 	setFont(wnd);
 
-	MSG msg;
-
-	while (GetMessage(&msg, NULL, 0, 0)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-
-	return true;
+	// message handling
+	messageLoop(wnd, data);
 }
