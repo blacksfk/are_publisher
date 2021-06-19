@@ -497,7 +497,7 @@ cJSON* hudToJSON(const HUD* curr, const HUD* prev) {
 const wchar_t* wstrStatus(Status s) {
 	switch (s) {
 	case STATUS_OFF:
-		return L"ACC not running or not in session";
+		return L"Not in session";
 	case STATUS_REPLAY:
 		return L"Watching replay";
 	case STATUS_LIVE:
