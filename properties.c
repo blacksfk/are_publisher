@@ -44,8 +44,8 @@ static cJSON* createCar(const Properties* props) {
 		RET_NULL(obj);
 	}
 
-	NUM_2_OBJ(obj, "maxRPM", props->maxRPM);
-	NUM_2_OBJ(obj, "tankCap", props->tankCap);
+	INT_2_OBJ(obj, "maxRPM", props->maxRPM);
+	FLOAT_2_OBJ(obj, "tankCap", props->tankCap);
 
 	return obj;
 }
@@ -64,7 +64,7 @@ static cJSON* createTrack(const Properties* props) {
 		RET_NULL(obj);
 	}
 
-	NUM_2_OBJ(obj, "sectors", props->sectorCount);
+	INT_2_OBJ(obj, "sectors", props->sectorCount);
 
 	return obj;
 }
@@ -79,8 +79,8 @@ static cJSON* createPitWindow(const Properties* props) {
 		return NULL;
 	}
 
-	NUM_2_OBJ(obj, "start", props->pitWindowStart);
-	NUM_2_OBJ(obj, "end", props->pitWindowEnd);
+	INT_2_OBJ(obj, "start", props->pitWindowStart);
+	INT_2_OBJ(obj, "end", props->pitWindowEnd);
 
 	return obj;
 }
@@ -96,12 +96,12 @@ static cJSON* createWeekend(const Properties* props) {
 	}
 
 	BOOL_2_OBJ(obj, "penaltiesEnabled", props->penaltiesEnabled);
-	NUM_2_OBJ(obj, "tyreBlankets", props->allowTyreBlankets);
-	NUM_2_OBJ(obj, "fuelRate", props->fuelRate);
-	NUM_2_OBJ(obj, "tyreRate", props->tyreRate);
-	NUM_2_OBJ(obj, "damageRate", props->damageRate);
-	NUM_2_OBJ(obj, "sessions", props->sessions);
-	NUM_2_OBJ(obj, "cars", props->cars);
+	FLOAT_2_OBJ(obj, "tyreBlankets", props->allowTyreBlankets);
+	FLOAT_2_OBJ(obj, "fuelRate", props->fuelRate);
+	FLOAT_2_OBJ(obj, "tyreRate", props->tyreRate);
+	FLOAT_2_OBJ(obj, "damageRate", props->damageRate);
+	INT_2_OBJ(obj, "sessions", props->sessions);
+	INT_2_OBJ(obj, "cars", props->cars);
 
 	return obj;
 }

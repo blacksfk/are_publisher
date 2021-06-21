@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <wchar.h>
+#include <math.h>
 #include <cjson/cJSON.h>
 
 #include "error.h"
@@ -36,29 +37,63 @@
 } while(0)
 
 /**
- * Add the number v to the object o under the key k. Deletes o and returns NULL
- * if adding the number failed.
+ * Add the integer v to the object o under the key k. Deletes o and returns NULL
+ * if adding the integer failed.
  */
-#define NUM_2_OBJ(o, k, v) do {\
+#define INT_2_OBJ(o, k, v) do {\
 	if (!cJSON_AddNumberToObject(o, k, v)) {\
 		RET_NULL(o);\
 	}\
 } while(0)
 
 /**
- * The same as NUM_2_OBJ but adds the number b to the object o under the key k if p is NULL
+ * The same as INT_2_OBJ but adds the integer b to the object o under the key k if p is NULL
  * or a and b are not equal. Used to compare between previous and current data frames.
- * Deletes o and returns NULL if adding the number failed.
+ * Deletes o and returns NULL if adding the integer failed.
  * Example:
- * NUM_2_OBJ_CMP(obj, "position", prev, prev->position, curr->position)
+ * INT_2_OBJ_CMP(obj, "position", prev, prev->position, curr->position)
  */
-#define NUM_2_OBJ_CMP(o, k, p, a, b) do {\
+#define INT_2_OBJ_CMP(o, k, p, a, b) do {\
 	if (!prev || a != b) {\
 		if (!cJSON_AddNumberToObject(o, k, b)) {\
 			RET_NULL(o);\
 		}\
 	}\
 } while(0)
+
+/**
+ * Similar to INT_2_OBJ but truncates v to three decimal places and adds it to the
+ * object o under the key k. Deletes o and returns NULL if adding the float failed.
+ * adding the float failed.
+ */
+#define FLOAT_2_OBJ(o, k, v) do {\
+	float f = truncf(1000 * v) / 1000;\
+	if (!cJSON_AddNumberToObject(o, k, f)) {\
+		RET_NULL(o);\
+	}\
+} while (0)
+
+/**
+ * Same as FLOAT_2_OBJ but adds the float b to the object o under the key k if p
+ * is NULL or a and b are not equal. Used to compare between previous and current
+ * data frames. Deletes o and returns NULL if adding the float failed.
+ */
+#define FLOAT_2_OBJ_CMP(o, k, p, a, b) do {\
+	if (!prev) {\
+		float f = truncf(1000 * b) / 1000;\
+		if (!cJSON_AddNumberToObject(o, k, f)) {\
+			RET_NULL(o);\
+		}\
+	} else {\
+		float f = truncf(1000 * a);\
+		float g = truncf(1000 * b);\
+		if (f != g) {\
+			if (!cJSON_AddNumberToObject(o, k, g / 1000)) {\
+				RET_NULL(o);\
+			}\
+		}\
+	}\
+} while (0)
 
 /**
  * Add the boolean v to the object o under the key k. Deletes o and returns NULL
