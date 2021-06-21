@@ -11,7 +11,6 @@ struct formHandlers {
 	HWND lblAddress;
 	HWND lblChannel;
 	HWND lblPassword;
-	HWND lblStatus;
 
 	HWND ctrlAddress;
 	HWND ctrlChannel;

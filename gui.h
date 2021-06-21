@@ -20,7 +20,7 @@ enum buttons {
 
 // main window width and height
 #define WINDOW_W 500
-#define WINDOW_H 220
+#define WINDOW_H 200
 
 // window internal margins
 #define MARGIN_X 10

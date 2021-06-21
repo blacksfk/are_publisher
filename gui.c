@@ -35,11 +35,9 @@ static bool getHandlerText(InstanceData* data) {
  * Create the static and edit controls and bind them to the parent window.
  * @param  parent   Used as hWndParent argument to CreateWindow.
  * @param  handlers Members are set to their respective window handlers.
- * @param  status   Initial text of the status label.
  * @return          True if all windows were created and false otherwise.
  */
-static bool createControls(HWND parent, struct formHandlers* handlers,
-							const wchar_t* status) {
+static bool createControls(HWND parent, struct formHandlers* handlers) {
 	// server address label
 	handlers->lblAddress = CreateWindowW(
 		L"Static",
@@ -145,28 +143,12 @@ static bool createControls(HWND parent, struct formHandlers* handlers,
 		NULL
 	);
 
-	// status label
-	handlers->lblStatus = CreateWindowW(
-		L"Static",
-		status,
-		FORM_LBL_STYLE,
-		MARGIN_X,
-		MARGIN_Y + (FORM_GROUP_H * 3) + FORM_BTN_H + FORM_MARGIN_H,
-		FORM_LBL_W,
-		FORM_LBL_H,
-		parent,
-		NULL,
-		NULL,
-		NULL
-	);
-
 	// return true if all of the windows were created successfully
 	// and false otherwise
 	return (
 		handlers->lblAddress &&
 		handlers->lblChannel &&
 		handlers->lblPassword &&
-		handlers->lblStatus &&
 		handlers->ctrlAddress &&
 		handlers->ctrlChannel &&
 		handlers->ctrlPassword &&
@@ -452,23 +434,6 @@ static void threadError(HWND wnd, InstanceData* data) {
 }
 
 /**
- * Update the text of the status label. Returns -1 if an error occurred
- * and 0 otherwise.
- */
-static int updateStatusLabel(HWND wnd, InstanceData* data) {
-	HWND label = data->handlers.lblStatus;
-	const wchar_t* status = wstrStatus(data->sm->curr.hud->status);
-
-	if (!SetWindowTextW(label, status)) {
-		msgBoxErr(wnd, (int) GetLastError(), L"Failed to update status label");
-
-		return -1;
-	}
-
-	return 0;
-}
-
-/**
  * Message and thread handling loop.
  */
 static void messageLoop(HWND wnd, InstanceData* data) {
@@ -486,8 +451,8 @@ static void messageLoop(HWND wnd, InstanceData* data) {
 			data->running,
 			// the handles array
 			&data->thread,
-			// how long to wait before returning in milliseconds
-			SLEEP_DURATION,
+			// how long to wait before returning
+			INFINITE,
 			// message event type
 			QS_ALLEVENTS,
 			// return as soon as the thread is signalled
@@ -514,11 +479,6 @@ static void messageLoop(HWND wnd, InstanceData* data) {
 		case WAIT_OBJECT_0 + 1:
 			// message received when the thread is running
 			result = dispatch(wnd, &msg);
-			break;
-		case WAIT_TIMEOUT:
-			// timeout reached
-			// use this opportunity to update the status label
-			result = updateStatusLabel(wnd, data);
 			break;
 		default:
 			// WAIT_ABANDONED_0 to WAIT_ABANDONED_0 + handle count is only
@@ -551,7 +511,7 @@ void gui(HINSTANCE h, int cmdShow, InstanceData* data) {
 	}
 
 	// create and add the form controls to the main window
-	if (!createControls(wnd, &data->handlers, wstrStatus(data->sm->curr.hud->status))) {
+	if (!createControls(wnd, &data->handlers)) {
 		msgBoxErr(NULL, ARE_GUI, L"Failed to create window controls");
 
 		return;
