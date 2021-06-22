@@ -370,7 +370,7 @@ static BOOL CALLBACK enumChildProcesses(HWND wnd, LPARAM l) {
 
 /**
  * Obtains the system default font and sets it for the window passed in along with
- * all of it's children.
+ * all of its children.
  * @param wnd
  */
 static void setFont(HWND wnd) {
@@ -454,7 +454,7 @@ static void messageLoop(HWND wnd, InstanceData* data) {
 			// how long to wait on the thread before returning
 			INFINITE,
 			// message event type
-			QS_ALLEVENTS,
+			QS_ALLEVENTS | QS_ALLPOSTMESSAGE,
 			// return as soon as the thread is signalled
 			0
 		);
