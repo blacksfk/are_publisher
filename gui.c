@@ -387,8 +387,8 @@ static void setFont(HWND wnd) {
 }
 
 /**
- * Dispatch messages to the window process. Returns 0 if a message was received
- * that isn't WM_QUIT, 1 if WM_QUIT was received, and -1 if an error occurred.
+ * Dispatch messages to the window process. Returns > 0 if a message was received
+ * that isn't WM_QUIT, 0 if WM_QUIT was received, and -1 if an error occurred.
  */
 static int dispatch(HWND wnd, MSG* msg) {
 	// GetMessage doesn't return a bool if it can return -1.
@@ -398,18 +398,18 @@ static int dispatch(HWND wnd, MSG* msg) {
 	// check if the message is a dialog message in order
 	// to provide keyboard TAB functionality
 	if (IsDialogMessageW(wnd, msg)) {
-		return 0;
+		return 1;
 	}
 
-	if (result > 0) {
-		// message received; dispatch and process it
-		TranslateMessage(msg);
-		DispatchMessage(msg);
+	if (result >= 0) {
+		if (result > 0) {
+			// not WM_QUIT
+			// message received; dispatch and process it
+			TranslateMessage(msg);
+			DispatchMessage(msg);
+		}
 
-		return 0;
-	} else if (result == 0) {
-		// WM_QUIT
-		return 1;
+		return result;
 	}
 
 	// an error occurred
@@ -438,10 +438,10 @@ static void threadError(HWND wnd, InstanceData* data) {
  */
 static void messageLoop(HWND wnd, InstanceData* data) {
 	// result is used to determine the current state
-	// -1: an error occurred
-	// 0: all good, continue processing messages
-	// 1: clean exit (user requested termination)
-	int result;
+	// < 0: an error occurred
+	// = 0: clean exit (user requested termination)
+	// > 0: all good, continue processing messages
+	int result = 0;
 	MSG msg;
 
 	do {
@@ -451,7 +451,7 @@ static void messageLoop(HWND wnd, InstanceData* data) {
 			data->running,
 			// the handles array
 			&data->thread,
-			// how long to wait before returning
+			// how long to wait on the thread before returning
 			INFINITE,
 			// message event type
 			QS_ALLEVENTS,
@@ -488,9 +488,9 @@ static void messageLoop(HWND wnd, InstanceData* data) {
 			result = -1;
 			msgBoxErr(wnd, (int) GetLastError(), L"MsgWaitForMultipleObjects failed");
 		}
-	} while (result == 0);
+	} while (result > 0);
 
-	if (result != 1) {
+	if (result < 0) {
 		// error occurred; destroy the window
 		DestroyWindow(wnd);
 	}
