@@ -10,6 +10,7 @@
 #include <cjson/cJSON.h>
 
 #include "error.h"
+#include "config.h"
 
 // 1kB should be enough for static error messages, right?
 #define MSG_BOX_BUF_SIZE 1024

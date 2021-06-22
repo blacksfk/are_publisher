@@ -249,6 +249,11 @@ DWORD WINAPI procedure(void* arg) {
 		if (data->sm->curr.hud->status != STATUS_LIVE) {
 			// wait until the player is in the car
 			Sleep(SLEEP_DURATION);
+
+		#ifdef DEBUG
+			wprintf(L"Current status: %ls\n", wstrStatus(data->sm->curr.hud->status));
+		#endif
+
 			continue;
 		}
 
@@ -262,6 +267,10 @@ DWORD WINAPI procedure(void* arg) {
 			!data->sm->prev.props ||
 			propertiesUpdated(data->sm->prev.props, data->sm->curr.props)
 		);
+
+	#ifdef DEBUG
+		wprintf(L"strlen(json): %zu\n", strlen(json));
+	#endif
 
 		if (!json) {
 			// out of memory
@@ -283,6 +292,10 @@ DWORD WINAPI procedure(void* arg) {
 		// for MAX_LOOP_TIME - duration (if at all)
 		ULONGLONG duration = GetTickCount64() - start;
 		ULONGLONG ms = MAX_LOOP_TIME - duration;
+
+	#ifdef DEBUG
+		wprintf(L"duration: %llu, ms: %llu\n", duration, ms);
+	#endif
 
 		// since ms is unsigned, the sleep duration could work out to be longer
 		// than MAX_LOOP_TIME due to an underflow. So only sleep if the value is between
