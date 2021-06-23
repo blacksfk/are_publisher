@@ -421,16 +421,27 @@ static int dispatch(HWND wnd, MSG* msg) {
 /**
  * Show an error message box if the thread exited early.
  */
-static void threadError(HWND wnd, InstanceData* data) {
+static int threadError(HWND wnd, InstanceData* data) {
 	DWORD code = 0;
 
 	data->running = false;
 
 	if (!GetExitCodeThread(data->thread, &code)) {
 		msgBoxErr(wnd, ARE_THREAD, L"GetExitCodeThread failed");
-	} else {
-		msgBoxErr(wnd, (int) code, L"Thread exited early");
+
+		return -1;
 	}
+
+	msgBoxErr(wnd, (int) code, L"Thread exited early");
+
+	if (code == ARE_CURL) {
+		// if there was a problem with curl, then most likely the user
+		// entered something invalid so don't close
+		return 1;
+	}
+
+	// some other more serious error
+	return -1;
 }
 
 /**
@@ -471,8 +482,7 @@ static void messageLoop(HWND wnd, InstanceData* data) {
 				// WAIT_OBJECT_0 is returned when the thread
 				// has been signalled
 				// thread exited early due to an error
-				threadError(wnd, data);
-				result = -1;
+				result = threadError(wnd, data);
 			}
 
 			break;
