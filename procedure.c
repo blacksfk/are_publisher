@@ -2,18 +2,18 @@
 
 // groups the url, password header, and curl handler
 struct attributes {
-	char* url;
 	CURL* curl;
-	char* header;
+	char* pwHeader;
+	struct curl_slist* headers;
 };
 
 /**
  * Free memory allocated for the url, header, and curl.
  */
 static void freeAttributes(struct attributes a) {
-	free(a.url);
-	free(a.header);
+	free(a.pwHeader);
 	curl_easy_cleanup(a.curl);
+	curl_slist_free_all(a.headers);
 }
 
 /**
@@ -33,7 +33,9 @@ static void freeAttributes(struct attributes a) {
  */
 static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 	// initialise all members to NULL
-	a->url = a->curl = a->header = NULL;
+	a->curl = NULL;
+	a->headers = NULL;
+	a->pwHeader = NULL;
 
 	// force initialisation of the message queue
 	MSG msg;
@@ -60,22 +62,44 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 		return ARE_OUT_OF_MEM;
 	}
 
-	// create the url and password header strings
-	a->url = createPublishURL(address, channel);
-	a->header = createPasswordHeader(password);
+#ifdef DEBUG
+	wprintf(L"address: %ls\nchannel ID: %ls\npassword: %ls\n",
+			data->address, data->channel, data->password);
+#endif
+
+	// create the password header string
+	a->pwHeader = createPasswordHeader(password);
 
 	// temporary strings no longer required
 	ATTR_CLEANUP(address, channel, password);
 
-	if (!a->url || !a->header) {
+	if (!a->pwHeader) {
 		// out of memory
 		freeAttributes(*a);
 
 		return ARE_OUT_OF_MEM;
 	}
 
+	// initialise the curl handle with the required parameters
+	a->headers = publishInit(curl, address, channel, a->pwHeader);
+
+	if (!a->headers) {
+		// out of memory
+		freeAttributes(*a);
+	}
+
 	// initialised successfully
 	return 0;
+}
+
+/**
+ * Checks the message queue for termination.
+ */
+static bool terminate() {
+	MSG msg;
+	PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE);
+
+	return (msg.message == WM_QUIT);
 }
 
 /**
@@ -107,7 +131,7 @@ static char* toJSON(struct memMaps prev, struct memMaps curr, bool sendProps) {
 		return NULL;
 	}
 
-	// conver physics parameters to a JSON object
+	// convert physics parameters to a JSON object
 	cJSON* physics = physicsToJSON(curr.physics, prev.physics);
 
 	if (!physics) {
@@ -159,16 +183,6 @@ static char* toJSON(struct memMaps prev, struct memMaps curr, bool sendProps) {
 }
 
 /**
- * Checks the message queue for termination.
- */
-static bool terminate() {
-	MSG msg;
-	PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE);
-
-	return (msg.message == WM_QUIT);
-}
-
-/**
  * Push a JSON data packet to the server.
  * @param  a
  * @param  json free'd once sent.
@@ -176,7 +190,7 @@ static bool terminate() {
  */
 static DWORD push(struct attributes a, char* json) {
 	// push the JSON string to the server
-	Response* res = publishData(a.curl, a.url, a.header, json);
+	Response* res = publish(a.curl, json);
 
 	// once sent the json string is no longer required
 	free(json);
@@ -195,6 +209,10 @@ static DWORD push(struct attributes a, char* json) {
 			// out of memory
 			return ARE_OUT_OF_MEM;
 		}
+
+	#ifdef DEBUG
+		wprintf(L"Curl: %ls\n", error);
+	#endif
 
 		msgBoxErr(NULL, ARE_CURL, error);
 		free(error);
@@ -215,6 +233,10 @@ static DWORD push(struct attributes a, char* json) {
 			// out of memory
 			return ARE_OUT_OF_MEM;
 		}
+
+	#ifdef DEBUG
+		wprintf(L"Status: %d\nBody: %ls\n", res->status, error);
+	#endif
 
 		msgBoxErr(NULL, ARE_REQ, error);
 		free(error);

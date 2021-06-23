@@ -11,8 +11,8 @@
 #define CHAN_ENDPOINT "/channel"
 #define PUB_ENDPOINT "publish/"
 
-Response* publishData(CURL* curl, const char* url, const char* pwHeader, const char* json);
-char* createPublishURL(const char* base, const char* cID);
 char* createPasswordHeader(const char* password);
+struct curl_slist* publishInit(CURL* curl, const char* base, const char* cID, const char* pw);
+Response* publish(CURL* curl, const char* json);
 
 #endif

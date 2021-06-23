@@ -62,40 +62,6 @@ static size_t cbBody(char* data, size_t s, size_t len, void* ptr) {
 }
 
 /**
- * Send a request.
- * @param  curl
- * @param  url
- * @return      A Response* containing the received data.
- */
-static Response* sendRequest(CURL* curl, const char* url) {
-	Response* r = createResponse();
-
-	if (!r) {
-		return NULL;
-	}
-
-	// set the URL
-	curl_easy_setopt(curl, CURLOPT_URL, url);
-
-	// set head response data handler
-	curl_easy_setopt(curl, CURLOPT_HEADERDATA, r);
-	curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, &cbHead);
-
-	// set body response data handler
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, r->body);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cbBody);
-
-	// send the request
-	r->curlCode = curl_easy_perform(curl);
-	populateResponse(curl, r);
-
-	// reset handler settings to defaults
-	curl_easy_reset(curl);
-
-	return r;
-}
-
-/**
  * Attach a variable number of headers to the curl handle.
  * @param  curl
  * @param  count The number of headers to attach.
@@ -126,103 +92,13 @@ static struct curl_slist* attachHeaders(CURL* curl, int count, ...) {
 }
 
 /**
- * Send an HTTP GET request.
- * @param  curl
- * @param  url
- * @return      Remember to free the object once the data has been handled.
- */
-static Response* httpGet(CURL* curl, const char* url) {
-	return sendRequest(curl, url);
-}
-
-/**
- * Send an HTTP POST request with a JSON body.
- * @param  curl
- * @param  url
- * @param  body
- * @return      Remember to free the object once the data has been handled.
- */
-static Response* httpPost(CURL* curl, const char* url) {
-	return sendRequest(curl, url);
-}
-
-/**
- * Send an HTTP PUT request with a JSON body.
- * @param  curl
- * @param  url
- * @param  body
- * @return      Remember to free the object once the data has been handled.
- */
-static Response* httpPut(CURL* curl, const char* url) {
-	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
-
-	return sendRequest(curl, url);
-}
-
-/**
- * Send an HTTP PATCH request with a JSON body.
- * @param  curl
- * @param  url
- * @param  body
- * @return      Remember to free the object once the data has been handled.
- */
-static Response* httpPatch(CURL* curl, const char* url) {
-	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PATCH");
-
-	return sendRequest(curl, url);
-}
-
-/**
- * Send an HTTP DELETE request.
- * @param  curl
- * @param  url
- * @return      Remember to free the object once the data has been handled.
- */
-static Response* httpDelete(CURL* curl, const char* url) {
-	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-
-	return sendRequest(curl, url);
-}
-
-/**
- * Send a JSON blob to the server.
- * @param  curl     Curl easy handler.
- * @param  url      Complete URL. Eg.: "localhost:3000/publish/abc123".
- * @param  pwHeader Complete password header. I.e. "Channel-Password: <pw>".
- * @param  json     The JSON blob.
- * @return          Response* or NULL if the headers could not be attached.
- */
-Response* publishData(CURL* curl, const char* url,
-					const char* pwHeader, const char* json) {
-	// attach the required headers
-	struct curl_slist* headers = attachHeaders(
-		curl, 2, "Content-Type: application/json", pwHeader
-	);
-
-	if (!headers) {
-		return NULL;
-	}
-
-	// attach body
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json);
-
-	// send the request
-	Response* r = httpPost(curl, url);
-
-	// free memory held by the header list
-	curl_slist_free_all(headers);
-
-	return r;
-}
-
-/**
  * Construct a URL to <base>/publish/<cID>.
  * Trailing slash on the base URL is handled appropriately.
  * @param  base Eg. "localhost:3000".
  * @param  cID  The channel ID.
  * @return      A heap allocated string.
  */
-char* createPublishURL(const char* base, const char* cID) {
+static char* createPublishURL(const char* base, const char* cID) {
 	size_t baseLen = strlen(base);
 	size_t bytes = baseLen + strlen(cID) + strlen(PUB_ENDPOINT) + 1;
 	bool trailingSlash = (base[baseLen - 1] == '/');
@@ -273,4 +149,70 @@ char* createPasswordHeader(const char* password) {
 	strcat(header, password);
 
 	return header;
+}
+
+/**
+ * Initialise a curl handle to publish data. Sets the URL, Content-Type header,
+ * Channel-Password header, and write callbacks. Returns a pointer to the attached
+ * headers that must be freed after the curl handle is no longer required.
+ * @param  curl Curl easy handle.
+ * @param  base Base URL. Eg.: "localhost:3000". Trailing slash optional.
+ * @param  cID  The channel ID to post the data to.
+ * @param  pw   The password of the channel.
+ * @return      Must be freed when the curl handle is no longer required.
+ */
+struct curl_slist* publishInit(CURL* curl, const char* base,
+								const char* cID, const char* pwHeader) {
+	struct curl_slist* headers = attachHeaders(
+		curl, 2, "Content-Type: application/json", pwHeader
+	);
+
+	if (!headers) {
+		return NULL;
+	}
+
+	char* url = createPublishURL(base, cID);
+
+	if (!url) {
+		curl_easy_reset(curl);
+		curl_slist_free_all(headers);
+
+		return NULL;
+	}
+
+	// attach the url
+	curl_easy_setopt(curl, CURLOPT_URL, url);
+
+	return headers;
+}
+
+/**
+ * Sends the JSON body to the already initialised and set URL.
+ * @param  curl Curl easy handle. Must be initialised with publishInit.
+ * @param  json The JSON string to attach as the request body.
+ * @return      Must be freed once used.
+ */
+Response* publish(CURL* curl, const char* json) {
+	Response* r = createResponse();
+
+	if (!r) {
+		return NULL;
+	}
+
+	// attach body
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json);
+
+	// set head response data handler
+	curl_easy_setopt(curl, CURLOPT_HEADERDATA, r);
+	curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, &cbHead);
+
+	// set body response data handler
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, r->body);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cbBody);
+
+	// send the request
+	r->curlCode = curl_easy_perform(curl);
+	populateResponse(curl, r);
+
+	return r;
 }
