@@ -17,7 +17,7 @@ static bool getHandlerText(InstanceData* data) {
 
 	int c = GetWindowTextW(
 		data->handlers.ctrlChannel,
-		data->address,
+		data->channel,
 		FORM_CTRL_BUF_SIZE
 	);
 
