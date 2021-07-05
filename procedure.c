@@ -299,6 +299,10 @@ DWORD WINAPI procedure(void* arg) {
 			return ARE_OUT_OF_MEM;
 		}
 
+	#ifdef DISABLE_BROADCAST
+		// json no longer required
+		free(json);
+	#else
 		// send the json to the server
 		result = push(attr, json);
 
@@ -306,6 +310,7 @@ DWORD WINAPI procedure(void* arg) {
 			// something went wrong with curl or no memory
 			return result;
 		}
+	#endif
 
 		// copy the current frame's data to the previous frame
 		sharedMemCurrToPrev(data->sm);
