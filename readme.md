@@ -8,6 +8,10 @@ Work like a real race engineer on a virtual car! This application simply reads f
 4. Install dependencies with: `conan install ..` (or the correct path to the directory containing conanfile.txt).
 5. Generate the build configuration with: `cmake ..` (or the correct path to the directory containing CMakeLists.txt).
 
+## Build time flags
+* **DEBUG:** Creates a terminal window for diagnostics and error output.
+* **DISABLE_BROADCAST:** Prevents the JSON data from being sent to the server.
+
 ## Compiling
 MSVC defaults to building for a debug environment so building for production requires switching the application's debug flag. The executable will be available under the `bin` sub-directory in either environment mode.
 
@@ -15,7 +19,7 @@ MSVC defaults to building for a debug environment so building for production req
 `cmake --build .`
 
 ### Production
-1. `cmake .. -D DEBUG=OFF`
+1. `cmake .. -D DEBUG=OFF -D DISABLE_BROADCAST=OFF`
 2. MSVC is a multi-environment compiler and therefore cmake requires an extra flag at build time: `cmake --build . --config Release`
 
 ## Licence
