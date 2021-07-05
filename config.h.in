@@ -1,1 +1,2 @@
 #cmakedefine DEBUG
+#cmakedefine DISABLE_BROADCAST
