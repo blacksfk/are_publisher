@@ -268,14 +268,14 @@ DWORD WINAPI procedure(void* arg) {
 	}
 
 	while (!terminate()) {
-		if (data->sm->curr.hud->status != STATUS_LIVE) {
+	#ifdef DEBUG
+		wprintf(L"Current status: %ls\n", wstrStatus(data->sm->curr.hud->status));
+		printPhysics(data->sm->curr.physics, stdout);
+	#endif
+
+		if (!physicsIsInCar(data->sm->curr.physics)) {
 			// wait until the player is in the car
 			Sleep(SLEEP_DURATION);
-
-		#ifdef DEBUG
-			wprintf(L"Current status: %ls\n", wstrStatus(data->sm->curr.hud->status));
-		#endif
-
 			continue;
 		}
 

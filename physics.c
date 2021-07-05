@@ -382,6 +382,27 @@ cJSON* physicsToJSON(const Physics* curr, const Physics* prev) {
 	return physics;
 }
 
+/**
+ * Whether or not the player is in the car according to
+ * the currently observed physics paramters.
+ */
+bool physicsIsInCar(const Physics* p) {
+	return (
+		// tyre pressure is reported as zero
+		// when not in the car
+		p->tyrePressure[W_FL] &&
+		p->tyrePressure[W_FR] &&
+		p->tyrePressure[W_RL] &&
+		p->tyrePressure[W_RR] &&
+
+		// car orientation angles are reported as
+		// zero when not in the car
+		p->yaw &&
+		p->pitch &&
+		p->roll
+	);
+}
+
 #ifdef DEBUG
 /**
  * Print physics diagnostics to the supplied pointer.

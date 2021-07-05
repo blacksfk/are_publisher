@@ -231,6 +231,7 @@ typedef struct physics {
 } Physics;
 
 cJSON* physicsToJSON(const Physics*, const Physics*);
+bool physicsIsInCar(const Physics*);
 
 #ifdef DEBUG
 void printPhysics(const Physics*, FILE*);
