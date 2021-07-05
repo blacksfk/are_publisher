@@ -381,3 +381,94 @@ cJSON* physicsToJSON(const Physics* curr, const Physics* prev) {
 
 	return physics;
 }
+
+#ifdef DEBUG
+/**
+ * Print physics diagnostics to the supplied pointer.
+ * @param p
+ * @param out Eg. stdout, stderr, or some file.
+ */
+void printPhysics(const Physics* p, FILE* out) {
+	fwprintf(
+		out,
+		L"### PHYSICS ###\n"
+		L"Accelerator:\t%.5f\n"
+		L"Brake:\t%.5f\n"
+		L"Clutch:\t%.5f\n"
+		L"Steering:\t%.5f\n"
+
+		L"Fuel:\t%.5f\n"
+		L"Gear:\t%d\n"
+		L"RPM:\t%d\n"
+		L"Speed:\t%.5f\n"
+
+		L"Ignition:\t%d\n"
+		L"Starter:\t%d\n"
+		L"Running:\t%d\n"
+
+		L"Roll:\t%.5f\n"
+		L"Pitch:\t%.5f\n"
+		L"Yaw:\t%.5f\n"
+
+		L"Ambient:\t%.5f\n"
+		L"Track:\t%.5f\n"
+
+		L"Tyre Pressure:\n"
+		L"\tFL: %.5f\tFR: %.5f\n"
+		L"\tRL: %.5f\tRR: %.5f\n"
+
+		L"Tyre Temperature (core):\n"
+		L"\tFL: %.5f\tFR: %.5f\n"
+		L"\tRL: %.5f\tRR: %.5f\n"
+
+		L"Brake Temperature:\n"
+		L"\tFL: %.5f\tFR: %.5f\n"
+		L"\tRL: %.5f\tRR: %.5f\n"
+
+		L"Pad Wear:\n"
+		L"\tFL: %.5f\tFR: %.5f\n"
+		L"\tRL: %.5f\tRR: %.5f\n"
+
+		L"Disc Wear:\n"
+		L"\tFL: %.5f\tFR: %.5f\n"
+		L"\tRL: %.5f\tRR: %.5f\n"
+		L"### END PHYSICS ###\n\n",
+
+		p->accelerator,
+		p->brake,
+		p->clutch,
+		p->steeringAngle,
+
+		p->fuel,
+		p->gear,
+		p->rpm,
+		p->speed,
+
+		p->ignitionOn,
+		p->starterMotorOn,
+		p->engineRunning,
+
+		p->roll,
+		p->pitch,
+		p->yaw,
+
+		p->ambientTemp,
+		p->trackTemp,
+
+		p->tyrePressure[W_FL], p->tyrePressure[W_FR],
+		p->tyrePressure[W_RL], p->tyrePressure[W_RR],
+
+		p->tyreCoreTemp[W_FL], p->tyreCoreTemp[W_FR],
+		p->tyreCoreTemp[W_RL], p->tyreCoreTemp[W_RR],
+
+		p->brakeTemp[W_FL], p->brakeTemp[W_FR],
+		p->brakeTemp[W_RL], p->brakeTemp[W_RR],
+
+		p->padWear[W_FL], p->padWear[W_FR],
+		p->padWear[W_RL], p->padWear[W_RR],
+
+		p->discWear[W_FL], p->discWear[W_FR],
+		p->discWear[W_RL], p->discWear[W_RR]
+	);
+}
+#endif
