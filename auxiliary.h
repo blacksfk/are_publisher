@@ -35,7 +35,7 @@
 #define RET_NULL(x) do {\
 	cJSON_Delete(x);\
 	return NULL;\
-} while(0)
+} while (0)
 
 /**
  * Add the integer v to the object o under the key k. Deletes o and returns NULL
@@ -45,7 +45,7 @@
 	if (!cJSON_AddNumberToObject(o, k, v)) {\
 		RET_NULL(o);\
 	}\
-} while(0)
+} while (0)
 
 /**
  * The same as INT_2_OBJ but adds the integer b to the object o under the key k if p is NULL
@@ -58,7 +58,7 @@
 	if (!prev || a != b) {\
 		INT_2_OBJ(o, k, b);\
 	}\
-} while(0)
+} while (0)
 
 // maximum number of bytes (including the decimal point) of a float represented
 // as a string.
@@ -67,7 +67,6 @@
 /**
  * Similar to INT_2_OBJ but rounds and truncates v to three decimal places and adds it to the
  * object o under the key k. Deletes o and returns NULL if adding the float failed.
- * adding the float failed.
  */
 #define FLOAT_2_OBJ(o, k, v) do {\
 	char raw[JSON_RAW_FLOAT_WIDTH];\
@@ -102,7 +101,7 @@
 	if (!cJSON_AddBoolToObject(o, k, v)) {\
 		RET_NULL(o);\
 	}\
-} while(0)
+} while (0)
 
 /**
  * The same as BOOL_2_OBJ but adds the boolean b to the object o under the key k if p is NULL
@@ -115,7 +114,7 @@
 	if (!p || a != b) {\
 		BOOL_2_OBJ(o, k, b);\
 	}\
-} while(0)
+} while (0)
 
 char* wstrToStr(const wchar_t* wstr);
 wchar_t* strToWstr(const char* str);
