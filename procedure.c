@@ -267,6 +267,19 @@ DWORD WINAPI procedure(void* arg) {
 		return result;
 	}
 
+#ifdef RECORD_DATA
+	// open file in binary mode so that fseek doesn't interpret
+	// a line feed character as two bytes due to windows
+	// convention being \r\n
+	FILE* out = fopen("data.json", "wb");
+
+	if (!out) {
+		return ARE_THREAD;
+	}
+
+	fprintf(out, "[\n");
+#endif
+
 	while (!terminate()) {
 	#ifdef DEBUG
 		wprintf(L"Current status: %ls\n", wstrStatus(data->sm->curr.hud->status));
@@ -290,14 +303,15 @@ DWORD WINAPI procedure(void* arg) {
 			propertiesUpdated(data->sm->prev.props, data->sm->curr.props)
 		);
 
-	#ifdef DEBUG
-		wprintf(L"strlen(json): %zu\n", strlen(json));
-	#endif
-
 		if (!json) {
 			// out of memory
-			return ARE_OUT_OF_MEM;
+			result = ARE_OUT_OF_MEM;
+			break;
 		}
+
+	#ifdef RECORD_DATA
+		fprintf(out, "\t%s,", json);
+	#endif
 
 	#ifdef DISABLE_BROADCAST
 		// json no longer required
@@ -308,7 +322,7 @@ DWORD WINAPI procedure(void* arg) {
 
 		if (result != 0) {
 			// something went wrong with curl or no memory
-			return result;
+			break;
 		}
 	#endif
 
@@ -332,8 +346,16 @@ DWORD WINAPI procedure(void* arg) {
 		}
 	}
 
+#ifdef RECORD_DATA
+	// go back two to overwrite the last comma
+	// encoding should be utf-8 so only need to go back 2 bytes
+	fseek(out, -2L, SEEK_CUR);
+	fprintf(out, "\n]\n");
+	fclose(out);
+#endif
+
 	// free all the mallocs
 	freeAttributes(attr);
 
-	return 0;
+	return result;
 }

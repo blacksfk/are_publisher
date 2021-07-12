@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 # compile time flags
 option(DEBUG "Enable logging for debugging purposes" ON)
 option(DISABLE_BROADCAST "Disable broadcasting during debugging" OFF)
+option(RECORD_DATA "Record JSON data to data.json" OFF)
 configure_file(config.h.in config.h)
 
 # project name

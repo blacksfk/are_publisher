@@ -9,18 +9,19 @@ Work like a real race engineer on a virtual car! This application simply reads f
 5. Generate the build configuration with: `cmake ..` (or the correct path to the directory containing CMakeLists.txt).
 
 ## Build time flags
-* **DEBUG:** Creates a terminal window for diagnostics and error output.
-* **DISABLE_BROADCAST:** Prevents the JSON data from being sent to the server.
+* **DEBUG**: Creates a terminal window for diagnostics and error output.
+* **DISABLE_BROADCAST**: Prevents the POST request from occurring.
+* **RECORD_DATA**: Saves the JSON data to data.json in a JSON array.
 
 ## Compiling
-MSVC defaults to building for a debug environment so building for production requires switching the application's debug flag. The executable will be available under the `bin` sub-directory in either environment mode.
+MSVC defaults to building for a debug environment so building for production requires an extra flag. The executable will be available under the `bin` sub-directory in either environment mode.
 
 ### Development
 `cmake --build .`
 
 ### Production
-1. `cmake .. -D DEBUG=OFF -D DISABLE_BROADCAST=OFF`
-2. MSVC is a multi-environment compiler and therefore cmake requires an extra flag at build time: `cmake --build . --config Release`
+1. `cmake .. -D DEBUG=OFF -D DISABLE_BROADCAST=OFF -D RECORD_DATA=OFF`
+2. `cmake --build . --config Release`
 
 ## Licence
 BSD-3-Clause
