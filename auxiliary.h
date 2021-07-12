@@ -56,20 +56,23 @@
  */
 #define INT_2_OBJ_CMP(o, k, p, a, b) do {\
 	if (!prev || a != b) {\
-		if (!cJSON_AddNumberToObject(o, k, b)) {\
-			RET_NULL(o);\
-		}\
+		INT_2_OBJ(o, k, b);\
 	}\
 } while(0)
 
+// maximum number of bytes (including the decimal point) of a float represented
+// as a string.
+#define JSON_RAW_FLOAT_WIDTH 20
+
 /**
- * Similar to INT_2_OBJ but truncates v to three decimal places and adds it to the
+ * Similar to INT_2_OBJ but rounds and truncates v to three decimal places and adds it to the
  * object o under the key k. Deletes o and returns NULL if adding the float failed.
  * adding the float failed.
  */
 #define FLOAT_2_OBJ(o, k, v) do {\
-	float f = truncf(1000 * v) / 1000;\
-	if (!cJSON_AddNumberToObject(o, k, f)) {\
+	char raw[JSON_RAW_FLOAT_WIDTH];\
+	snprintf(raw, JSON_RAW_FLOAT_WIDTH, "%.3f", v);\
+	if (!cJSON_AddRawToObject(o, k, raw)) {\
 		RET_NULL(o);\
 	}\
 } while (0)
@@ -81,17 +84,12 @@
  */
 #define FLOAT_2_OBJ_CMP(o, k, p, a, b) do {\
 	if (!prev) {\
-		float f = truncf(1000 * b) / 1000;\
-		if (!cJSON_AddNumberToObject(o, k, f)) {\
-			RET_NULL(o);\
-		}\
+		FLOAT_2_OBJ(o, k, b);\
 	} else {\
-		float f = truncf(1000 * a);\
-		float g = truncf(1000 * b);\
-		if (f != g) {\
-			if (!cJSON_AddNumberToObject(o, k, g / 1000)) {\
-				RET_NULL(o);\
-			}\
+		float f1 = truncf(a * 1000);\
+		float f2 = truncf(b * 1000);\
+		if (f1 != f2) {\
+			FLOAT_2_OBJ(o, k, b);\
 		}\
 	}\
 } while (0)
@@ -115,9 +113,7 @@
  */
 #define BOOL_2_OBJ_CMP(o, k, p, a, b) do {\
 	if (!p || a != b) {\
-		if (!cJSON_AddBoolToObject(o, k, b)) {\
-			RET_NULL(o);\
-		}\
+		BOOL_2_OBJ(o, k, b);\
 	}\
 } while(0)
 
