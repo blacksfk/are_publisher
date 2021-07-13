@@ -6,7 +6,7 @@ struct item {
 };
 
 /**
- * accelerator, brake, clutch, steeringAngle, pitLimiter.
+ * accelerator, brake, steeringAngle, pitLimiter.
  *
  * @param curr Current frame Physics data.
  * @param prev Previous frame Physics data.
@@ -20,7 +20,6 @@ static cJSON* createInput(const Physics* curr, const Physics* prev) {
 
 	FLOAT_2_OBJ_CMP(obj, "accelerator", prev, prev->accelerator, curr->accelerator);
 	FLOAT_2_OBJ_CMP(obj, "brake", prev, prev->brake, curr->brake);
-	FLOAT_2_OBJ_CMP(obj, "clutch", prev, prev->clutch, curr->clutch);
 	FLOAT_2_OBJ_CMP(obj, "steeringAngle", prev, prev->steeringAngle, curr->steeringAngle);
 	BOOL_2_OBJ_CMP(obj, "pitLimiter", prev, prev->pitLimiter, curr->pitLimiter);
 
@@ -340,7 +339,7 @@ static const struct item items[PHYSICS_ITEM_COUNT] = {
 };
 
 /**
- * Adds the sub-objects above along with: speed, gear, tc, abs.
+ * Adds the sub-objects above along with: speed, gear, tcIntervention, absIntervention.
  * If prev is not null, it is compared against to determine whether
  * the parameter should be included in the JSON object or not. Identical
  * values between frames will result in the key and its value being excluded
@@ -358,8 +357,15 @@ cJSON* physicsToJSON(const Physics* curr, const Physics* prev) {
 
 	FLOAT_2_OBJ_CMP(physics, "speed", prev, prev->speed, curr->speed);
 	INT_2_OBJ_CMP(physics, "gear", prev, prev->gear, curr->gear);
-	FLOAT_2_OBJ_CMP(physics, "tc", prev, prev->tc, curr->tc);
-	FLOAT_2_OBJ_CMP(physics, "abs", prev, prev->abs, curr->abs);
+
+	FLOAT_2_OBJ_CMP(physics, "tcIntervention", prev,
+		prev->tcIntervention, curr->tcIntervention);
+
+	FLOAT_2_OBJ_CMP(physics, "absIntervention", prev,
+		prev->absIntervention, curr->absIntervention);
+
+	FLOAT_2_OBJ_CMP(physics, "fuelRemaining", prev,
+		prev->fuelRemaining, curr->fuelRemaining);
 
 	// sub-objects
 	for (int i = 0; i < PHYSICS_ITEM_COUNT; i++) {
@@ -460,7 +466,7 @@ void printPhysics(const Physics* p, FILE* out) {
 		p->clutch,
 		p->steeringAngle,
 
-		p->fuel,
+		p->fuelRemaining,
 		p->gear,
 		p->rpm,
 		p->speed,

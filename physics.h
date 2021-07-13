@@ -33,10 +33,13 @@ typedef struct physics {
 	// brake input (range: 0 to 1.0)
 	float brake;
 
-	// fuel remaining in KG (wtf??)
-	float fuel;
+	// fuel remaining in litres
+	float fuelRemaining;
 
 	// current gear
+	// 0: reverse
+	// 1: neutral
+	// 2..n: 1st .. nth
 	int gear;
 
 	// current engine RPM
@@ -82,8 +85,8 @@ typedef struct physics {
 	// not used in ACC
 	float drs;
 
-	// traction control engaged
-	float tc;
+	// traction control intervention (0 .. 1)
+	float tcIntervention;
 
 	// yaw angle
 	float yaw;
@@ -106,8 +109,8 @@ typedef struct physics {
 	// whether the pit limiter is enabled or not
 	int pitLimiter;
 
-	// ABS engaged
-	float abs;
+	// ABS intervention (0 .. 1)
+	float absIntervention;
 
 	// not used in ACC
 	float kersCharge;
@@ -153,6 +156,7 @@ typedef struct physics {
 	float brakeTemp[4];
 
 	// clutch input (range: 0 to 1.0)
+	// doesn't appear to work
 	float clutch;
 
 	// not used in ACC
@@ -204,7 +208,9 @@ typedef struct physics {
 	// brake pressure (FL, FR, RL, RR)
 	float brakePressure[4];
 
-	// brake pad compound (1, 2, 3, 4)
+	// brake pad compound
+	// 0: pad 1
+	// n: pad (n + 1)
 	int frontBrakeCompound;
 	int rearBrakeCompound;
 

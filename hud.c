@@ -7,7 +7,7 @@ struct item {
 };
 
 /**
- * last, best, current, delta, estimated, lastSplit, isDeltaPositive, isValidLap.
+ * prev, best, current, delta, estimated, currSector, isDeltaPositive, isValidLap.
  *
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
@@ -19,14 +19,16 @@ static cJSON* createLaptimes(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	// current lap time should always be different so need for comparison
-	INT_2_OBJ(obj, "current", curr->currentTime);
+	INT_2_OBJ_CMP(obj, "curr", prev, prev->currLapTime, curr->currLapTime);
+	INT_2_OBJ_CMP(obj, "prev", prev, prev->prevLapTime, curr->prevLapTime);
+	INT_2_OBJ_CMP(obj, "best", prev, prev->bestLapTime, curr->bestLapTime);
 
-	INT_2_OBJ_CMP(obj, "last", prev, prev->lastTime, curr->lastTime);
-	INT_2_OBJ_CMP(obj, "best", prev, prev->bestTime, curr->bestTime);
 	INT_2_OBJ_CMP(obj, "delta", prev, prev->delta, curr->delta);
 	INT_2_OBJ_CMP(obj, "estimated", prev, prev->estimatedLapTime, curr->estimatedLapTime);
-	INT_2_OBJ_CMP(obj, "lastSplit", prev, prev->lastSplit, curr->lastSplit);
+
+	INT_2_OBJ_CMP(obj, "currSectorIndex", prev, prev->currSectorIndex, curr->currSectorIndex);
+	INT_2_OBJ_CMP(obj, "currSector", prev, prev->currSectorTime, curr->currSectorTime);
+	INT_2_OBJ_CMP(obj, "prevSector", prev, prev->prevSectorTime, curr->prevSectorTime);
 
 	BOOL_2_OBJ_CMP(obj, "isDeltaPositive", prev, prev->isDeltaPositive, curr->isDeltaPositive);
 	BOOL_2_OBJ_CMP(obj, "isValidLap", prev, prev->isValidLap, curr->isValidLap);

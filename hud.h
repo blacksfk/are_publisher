@@ -101,9 +101,11 @@ typedef struct hud {
 	int packetId;
 
 	// game status
+	// refer to the Status enum above
 	Status status;
 
 	// current session
+	// refer to the SessionType enum above
 	SessionType session;
 
 	// lap times as a widechar string
@@ -119,24 +121,24 @@ typedef struct hud {
 	int position;
 
 	// lap times expressed in milliseconds
-	int currentTime;
-	int lastTime;
-	int bestTime;
+	int currLapTime;
+	int prevLapTime;
+	int bestLapTime;
 
 	// time remaining in the current session
 	float sessionTimeLeft;
 
-	// distance traveled in the current stint
+	// distance traveled over the whole session
 	float distanceTraveled;
 
 	// whether or not the car is in its pit box
 	int isBoxed;
 
 	// current track sector
-	int currentSectorIndex;
+	int currSectorIndex;
 
-	// last sector in milliseconds
-	int lastSectorTime;
+	// previous sector in milliseconds
+	int prevSectorTime;
 
 	// duplicate of completedLaps
 	int numberOfLaps;
@@ -258,8 +260,8 @@ typedef struct hud {
 	// whether or not the delta is positive
 	int isDeltaPositive;
 
-	// last split time expressed in milliseconds (possible duplicate of lastSectorTime)
-	int lastSplit;
+	// the current sector timer
+	int currSectorTime;
 
 	// whether or not the current lap is valid
 	int isValidLap;

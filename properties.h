@@ -61,8 +61,8 @@ typedef struct properties {
 	float damageRate;
 	float allowTyreBlankets;
 	float aidStability;
-	int aidAutoClutch;
-	int aidAutoBlip;
+	int autoClutch;
+	int autoBlip;
 
 	// not used in ACC
 	int hasDRS;
@@ -87,6 +87,9 @@ typedef struct properties {
 	int isMultiplayer;
 
 	// tyre names (possibly DHD2 or DHE...)
+	// this is totally busted with dryTyreName seemingly always
+	// an empty string and wetTyreName only containing the last two
+	// characters. I.e. "HE" instead of "DHE"
 	wchar_t dryTyreName[33];
 	wchar_t wetTyreName[33];
 } Properties;

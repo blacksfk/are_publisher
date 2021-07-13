@@ -136,14 +136,6 @@ cJSON* propertiesToJSON(const Properties* props) {
 		RET_NULL(obj);
 	}
 
-	if (!addWstrToObject(obj, "dryTyre", props->dryTyreName)) {
-		RET_NULL(obj);
-	}
-
-	if (!addWstrToObject(obj, "wetTyre", props->wetTyreName)){
-		RET_NULL(obj);
-	}
-
 	for (int i = 0; i < PROPS_ITEM_COUNT; i++) {
 		cJSON* ptr = items[i].create(props);
 
