@@ -6,6 +6,22 @@ struct item {
 	cJSON* (*create)(const HUD*, const HUD*);
 };
 
+// for no apparent reason, kunos have decided to set invalid laptime values
+// to (2^31)-1 (i can't make sense of why this specific value).
+// In order to mitigate sending garbage values like described above: if the
+// time is greater than MAX_TIME, -1 is sent is sent instead.
+#define MAX_TIME 6000
+
+#define LAPTIME(o, k, p, a, b) do {\
+	if (!prev || a != b) {\
+		if (b > MAX_TIME) {\
+			INT_2_OBJ(o, k, -1);\
+		} else {\
+			INT_2_OBJ(o, k, b);\
+		}\
+	}\
+} while (0)
+
 /**
  * prev, best, current, delta, estimated, currSector, isDeltaPositive, isValidLap.
  *
@@ -19,12 +35,13 @@ static cJSON* createLaptimes(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	INT_2_OBJ_CMP(obj, "curr", prev, prev->currLapTime, curr->currLapTime);
-	INT_2_OBJ_CMP(obj, "prev", prev, prev->prevLapTime, curr->prevLapTime);
-	INT_2_OBJ_CMP(obj, "best", prev, prev->bestLapTime, curr->bestLapTime);
+	LAPTIME(obj, "curr", prev, prev->currLapTime, curr->currLapTime);
+	LAPTIME(obj, "prev", prev, prev->prevLapTime, curr->prevLapTime);
+	LAPTIME(obj, "best", prev, prev->bestLapTime, curr->bestLapTime);
+	LAPTIME(obj, "estimated", prev, prev->estimatedLapTime,
+		curr->estimatedLapTime);
 
 	INT_2_OBJ_CMP(obj, "delta", prev, prev->delta, curr->delta);
-	INT_2_OBJ_CMP(obj, "estimated", prev, prev->estimatedLapTime, curr->estimatedLapTime);
 
 	INT_2_OBJ_CMP(obj, "currSectorIndex", prev, prev->currSectorIndex, curr->currSectorIndex);
 	INT_2_OBJ_CMP(obj, "currSector", prev, prev->currSectorTime, curr->currSectorTime);
