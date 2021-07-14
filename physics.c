@@ -26,21 +26,6 @@ static cJSON* createInput(const Physics* curr, const Physics* prev) {
 	return obj;
 }
 
-static cJSON* createBrakePressure(const Physics* curr, const Physics* prev) {
-	cJSON* obj = cJSON_CreateObject();
-
-	if (!obj) {
-		return NULL;
-	}
-
-	FLOAT_2_OBJ_CMP(obj, "fl", prev, prev->brakePressure[W_FL], curr->brakePressure[W_FL]);
-	FLOAT_2_OBJ_CMP(obj, "fr", prev, prev->brakePressure[W_FR], curr->brakePressure[W_FR]);
-	FLOAT_2_OBJ_CMP(obj, "rl", prev, prev->brakePressure[W_RL], curr->brakePressure[W_RL]);
-	FLOAT_2_OBJ_CMP(obj, "rr", prev, prev->brakePressure[W_RR], curr->brakePressure[W_RR]);
-
-	return obj;
-}
-
 static cJSON* createPadWear(const Physics* curr, const Physics* prev) {
 	cJSON* obj = cJSON_CreateObject();
 
@@ -99,10 +84,9 @@ static cJSON* createBrakeCompound(const Physics* curr, const Physics* prev) {
 	return obj;
 }
 
-#define PHYSICS_BRAKE_ITEM_COUNT 5
+#define PHYSICS_BRAKE_ITEM_COUNT 4
 
 struct item brakeItems[PHYSICS_BRAKE_ITEM_COUNT] = {
-	{"pressure", &createBrakePressure},
 	{"compound", &createBrakeCompound},
 	{"padWear", &createPadWear},
 	{"discWear", &createDiscWear},
