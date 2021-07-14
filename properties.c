@@ -85,39 +85,17 @@ static cJSON* createPitWindow(const Properties* props) {
 	return obj;
 }
 
-/**
- * penaltiesEnabled, fuelRate, tyreRate, damageRate, tyreBlankets, sessions, cars.
- */
-static cJSON* createWeekend(const Properties* props) {
-	cJSON* obj = cJSON_CreateObject();
-
-	if (!obj) {
-		return NULL;
-	}
-
-	BOOL_2_OBJ(obj, "penaltiesEnabled", props->penaltiesEnabled);
-	FLOAT_2_OBJ(obj, "tyreBlankets", props->allowTyreBlankets);
-	FLOAT_2_OBJ(obj, "fuelRate", props->fuelRate);
-	FLOAT_2_OBJ(obj, "tyreRate", props->tyreRate);
-	FLOAT_2_OBJ(obj, "damageRate", props->damageRate);
-	INT_2_OBJ(obj, "sessions", props->sessions);
-	INT_2_OBJ(obj, "cars", props->cars);
-
-	return obj;
-}
-
-#define PROPS_ITEM_COUNT 5
+#define PROPS_ITEM_COUNT 4
 
 static const struct item items[PROPS_ITEM_COUNT] = {
 	{"player", &createPlayer},
 	{"car", &createCar},
 	{"track", &createTrack},
-	{"pitWindow", &createPitWindow},
-	{"weekend", &createWeekend}
+	{"pitWindow", &createPitWindow}
 };
 
 /**
- * Adds the sub-objects above along with: sharedMemVer, accVer, dryTyre, wetTyre.
+ * Adds the sub-objects above along with: sessions, sharedMemVer, accVer, dryTyre, wetTyre.
  * Properties contains static information and is only changed on a new instance
  * initialisation. Eg. when the player joins a server or creates a new weekend etc.
  */
@@ -127,6 +105,8 @@ cJSON* propertiesToJSON(const Properties* props) {
 	if (!obj) {
 		return NULL;
 	}
+
+	INT_2_OBJ(obj, "sessions", props->sessions);
 
 	if (!addWstrToObject(obj, "sharedMemVer", props->sharedMemVer)) {
 		RET_NULL(obj);

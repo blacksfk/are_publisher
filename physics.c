@@ -6,7 +6,7 @@ struct item {
 };
 
 /**
- * accelerator, brake, steeringAngle, pitLimiter.
+ * accelerator, brake, steering, pitLimiter.
  *
  * @param curr Current frame Physics data.
  * @param prev Previous frame Physics data.
@@ -20,7 +20,7 @@ static cJSON* createInput(const Physics* curr, const Physics* prev) {
 
 	FLOAT_2_OBJ_CMP(obj, "accelerator", prev, prev->accelerator, curr->accelerator);
 	FLOAT_2_OBJ_CMP(obj, "brake", prev, prev->brake, curr->brake);
-	FLOAT_2_OBJ_CMP(obj, "steeringAngle", prev, prev->steeringAngle, curr->steeringAngle);
+	FLOAT_2_OBJ_CMP(obj, "steering", prev, prev->steering, curr->steering);
 	BOOL_2_OBJ_CMP(obj, "pitLimiter", prev, prev->pitLimiter, curr->pitLimiter);
 
 	return obj;
@@ -168,7 +168,7 @@ static cJSON* createTemperature(const Physics* curr, const Physics* prev) {
 }
 
 /**
- * waterTemp, running, starter, igntion, rpm, boostPressure.
+ * running, starter, igntion, rpm, boostPressure.
  *
  * @param curr Current frame Physics data.
  * @param prev Previous frame Physics data.
@@ -180,7 +180,6 @@ static cJSON* createMotor(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	FLOAT_2_OBJ_CMP(obj, "waterTemp", prev, prev->waterTemp, curr->waterTemp);
 	INT_2_OBJ_CMP(obj, "rpm", prev, prev->rpm, curr->rpm);
 	FLOAT_2_OBJ_CMP(obj, "boostPressure", prev, prev->boostPressure, curr->boostPressure);
 
@@ -263,26 +262,6 @@ static cJSON* createTyres(const Physics* curr, const Physics* prev) {
 }
 
 /**
- * pitch, yaw, roll.
- *
- * @param curr Current frame Physics data.
- * @param prev Previous frame Physics data.
- */
-static cJSON* createAngle(const Physics* curr, const Physics* prev) {
-	cJSON* obj = cJSON_CreateObject();
-
-	if (!obj) {
-		return NULL;
-	}
-
-	FLOAT_2_OBJ_CMP(obj, "pitch", prev, prev->pitch, curr->pitch);
-	FLOAT_2_OBJ_CMP(obj, "roll", prev, prev->roll, curr->roll);
-	FLOAT_2_OBJ_CMP(obj, "yaw", prev, prev->yaw, curr->yaw);
-
-	return obj;
-}
-
-/**
  * front, left, centre, right, rear.
  *
  * @param curr Current frame Physics data.
@@ -304,28 +283,7 @@ static cJSON* createDamage(const Physics* curr, const Physics* prev) {
 	return obj;
 }
 
-/**
- * fl, fr, rl, rr.
- *
- * @param curr Current frame Physics data.
- * @param prev Previous frame Physics data.
- */
-static cJSON* createSuspensionTravel(const Physics* curr, const Physics* prev) {
-	cJSON* obj = cJSON_CreateObject();
-
-	if (!obj) {
-		return NULL;
-	}
-
-	FLOAT_2_OBJ_CMP(obj, "fl", prev, prev->suspensionTravel[W_FL], curr->suspensionTravel[W_FL]);
-	FLOAT_2_OBJ_CMP(obj, "fr", prev, prev->suspensionTravel[W_FR], curr->suspensionTravel[W_FR]);
-	FLOAT_2_OBJ_CMP(obj, "rl", prev, prev->suspensionTravel[W_RL], curr->suspensionTravel[W_RL]);
-	FLOAT_2_OBJ_CMP(obj, "rr", prev, prev->suspensionTravel[W_RR], curr->suspensionTravel[W_RR]);
-
-	return obj;
-}
-
-#define PHYSICS_ITEM_COUNT 8
+#define PHYSICS_ITEM_COUNT 6
 
 static const struct item items[PHYSICS_ITEM_COUNT] = {
 	{"input", &createInput},
@@ -333,9 +291,7 @@ static const struct item items[PHYSICS_ITEM_COUNT] = {
 	{"temp", &createTemperature},
 	{"motor", &createMotor},
 	{"tyres", &createTyres},
-	{"angle", &createAngle},
-	{"damage", &createDamage},
-	{"suspensionTravel", &createSuspensionTravel}
+	{"damage", &createDamage}
 };
 
 /**
@@ -464,7 +420,7 @@ void printPhysics(const Physics* p, FILE* out) {
 		p->accelerator,
 		p->brake,
 		p->clutch,
-		p->steeringAngle,
+		p->steering,
 
 		p->fuelRemaining,
 		p->gear,

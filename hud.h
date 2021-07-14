@@ -219,16 +219,16 @@ typedef struct hud {
 	int rainLight;
 
 	// whether or not the headlights are being flashed
-	int flashingLights;
+	int flasher;
 
 	// headlight level (driving, on, endurance)
-	int lights;
+	int headlightState;
 
 	// exhaust temperature
 	float exhaustTemperature;
 
 	// windscreen wiper level
-	int wiperLevel;
+	int wiperState;
 
 	// current driver's total time remaining in milliseconds
 	int totalTimeLeft;

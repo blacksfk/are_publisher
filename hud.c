@@ -23,7 +23,8 @@ struct item {
 } while (0)
 
 /**
- * prev, best, current, delta, estimated, currSector, isDeltaPositive, isValidLap.
+ * prev, best, curr, delta, estimated, currSector, currSectorIndex,
+ * prevSector, isDeltaPositive, isValidLap.
  *
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
@@ -54,8 +55,8 @@ static cJSON* createLaptimes(const HUD* curr, const HUD* prev) {
 }
 
 /**
- * tc, tcCut, engineMap, abs, rainLight, flashingLights, lights, wiperLevel, leftIndicator,
- * rightIndicator.
+ * tc, tcCut, engineMap, abs, rainLight, flasher, headlightState, wiperState,
+ * leftIndicator, rightIndicator.
  *
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
@@ -71,10 +72,11 @@ static cJSON* createElectronics(const HUD* curr, const HUD* prev) {
 	INT_2_OBJ_CMP(obj, "tcCut", prev, prev->tcCut, curr->tcCut);
 	INT_2_OBJ_CMP(obj, "engineMap", prev, prev->engineMap, curr->engineMap);
 	INT_2_OBJ_CMP(obj, "abs", prev, prev->abs, curr->abs);
-	INT_2_OBJ_CMP(obj, "rainLight", prev, prev->rainLight, curr->rainLight);
-	INT_2_OBJ_CMP(obj, "flashingLights", prev, prev->flashingLights, curr->flashingLights);
-	INT_2_OBJ_CMP(obj, "lights", prev, prev->lights, curr->lights);
-	INT_2_OBJ_CMP(obj, "wiperLevel", prev, prev->wiperLevel, curr->wiperLevel);
+	INT_2_OBJ_CMP(obj, "headlightState", prev, prev->headlightState, curr->headlightState);
+	INT_2_OBJ_CMP(obj, "wiperState", prev, prev->wiperState, curr->wiperState);
+
+	BOOL_2_OBJ_CMP(obj, "rainLight", prev, prev->rainLight, curr->rainLight);
+	BOOL_2_OBJ_CMP(obj, "flasher", prev, prev->flasher, curr->flasher);
 
 	BOOL_2_OBJ_CMP(obj, "leftIndicator", prev, prev->leftIndicator, curr->leftIndicator);
 	BOOL_2_OBJ_CMP(obj, "rightIndicator", prev, prev->rightIndicator, curr->rightIndicator);
@@ -168,7 +170,7 @@ static cJSON* rainIntensity(RainIntensity ri, cJSON* obj, char* key) {
 }
 
 /**
- * current, in10, in30.
+ * curr, in10, in30.
  *
  * @param  curr Current frame HUD data.
  * @param  prev Previous frame HUD data.
@@ -181,7 +183,7 @@ static cJSON* createRain(const HUD* curr, const HUD* prev) {
 	}
 
 	if (!prev || prev->rainIntensityCurr != curr->rainIntensityCurr) {
-		if (!rainIntensity(curr->rainIntensityCurr, obj, "current")) {
+		if (!rainIntensity(curr->rainIntensityCurr, obj, "curr")) {
 			RET_NULL(obj);
 		}
 	}
@@ -300,7 +302,6 @@ static cJSON* createPitstop(const HUD* curr, const HUD* prev) {
 	}
 
 	INT_2_OBJ_CMP(obj, "tyreSet", prev, prev->pitStopTyreSet, curr->pitStopTyreSet);
-	INT_2_OBJ_CMP(obj, "strategyTyreSet", prev, prev->strategyTyreSet, curr->strategyTyreSet);
 	INT_2_OBJ_CMP(obj, "fuel", prev, prev->pitStopFuel, curr->pitStopFuel);
 
 	cJSON* pressure = createPressure(curr, prev);
@@ -394,7 +395,7 @@ static cJSON* createYellow(const HUD* curr, const HUD* prev) {
 }
 
 /**
- * current, yellow, yellow.global, yellow.sector1, yellow.sector2, yellow.sector3, white,
+ * curr, yellow, yellow.global, yellow.sector1, yellow.sector2, yellow.sector3, white,
  * green, chequered, red.
  *
  * @param  curr Current frame HUD data.
@@ -407,7 +408,7 @@ static cJSON* createFlag(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	INT_2_OBJ_CMP(obj, "current", prev, prev->flag, curr->flag);
+	INT_2_OBJ_CMP(obj, "curr", prev, prev->flag, curr->flag);
 	BOOL_2_OBJ_CMP(obj, "green", prev, prev->globalGreen, curr->globalGreen);
 	BOOL_2_OBJ_CMP(obj, "chequered", prev, prev->chequered, curr->chequered);
 	BOOL_2_OBJ_CMP(obj, "red", prev, prev->globalRed, curr->globalRed);
@@ -447,7 +448,7 @@ static const struct item items[HUD_ITEM_COUNT] = {
 };
 
 /**
- * Adds the sub-objects above along with: trackStatus, position, distanceTraveled, gameStatus,
+ * Adds the sub-objects above along with: trackStatus, position, distanceTraveled,
  * laps, isBoxed, isInPitLane, mandatoryPitDone, rainTyres, tyreCompound.
  *
  * @param  curr Current frame HUD data.
@@ -477,7 +478,6 @@ cJSON* hudToJSON(const HUD* curr, const HUD* prev) {
 
 	INT_2_OBJ_CMP(obj, "position", prev, prev->position, curr->position);
 	FLOAT_2_OBJ_CMP(obj, "distanceTraveled", prev, prev->distanceTraveled, curr->distanceTraveled);
-	INT_2_OBJ_CMP(obj, "gameStatus", prev, prev->status, curr->status);
 	INT_2_OBJ_CMP(obj, "laps", prev, prev->completedLaps, curr->completedLaps);
 	INT_2_OBJ_CMP(obj, "tyreSet", prev, prev->currTyreSet, curr->currTyreSet);
 

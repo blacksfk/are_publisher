@@ -46,7 +46,7 @@ typedef struct physics {
 	int rpm;
 
 	// steering angle (range: -1.0 to 1.0)
-	float steeringAngle;
+	float steering;
 
 	// current speed (in km/h)
 	float speed;
