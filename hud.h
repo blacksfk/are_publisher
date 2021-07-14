@@ -269,7 +269,8 @@ typedef struct hud {
 	// predicted laps remaining based on the fuel level
 	float estimatedLapsRemaining;
 
-	// track status ("Green", "Fast", "Optimum", "Damp", "Wet")
+	// track status ("Green", "Fast", "Optimum", "Damp", "Wet", "Flooded")
+	// string version of trackGrip
 	wchar_t trackStatus[33];
 
 	// remaining mandatory pitstops
@@ -315,6 +316,7 @@ typedef struct hud {
 	float pitStopRR;
 
 	// track grip
+	// int version of trackStatus
 	TrackGrip trackGrip;
 
 	// rain intensity levels

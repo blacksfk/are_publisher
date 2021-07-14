@@ -220,33 +220,8 @@ static cJSON* createConditions(const HUD* curr, const HUD* prev) {
 	FLOAT_2_OBJ_CMP(obj, "windDirection", prev, prev->windDirection, curr->windDirection);
 
 	// track grip
-	if (!prev || prev->trackGrip != curr->trackGrip) {
-		char* str;
-
-		switch (curr->trackGrip) {
-			case TG_FAST:
-				str = "Fast";
-				break;
-			case TG_OPTIMUM:
-				str = "Optimum";
-				break;
-			case TG_GREASY:
-				str = "Greasy";
-				break;
-			case TG_DAMP:
-				str = "Damp";
-				break;
-			case TG_WET:
-				str = "Wet";
-				break;
-			case TG_FLOODED:
-				str = "Flooded";
-				break;
-			default:
-				str = "Green";
-		}
-
-		if (!cJSON_AddStringToObject(obj, "track", str)) {
+	if (!prev || wcscmp(prev->trackStatus, curr->trackStatus) != 0) {
+		if (!addWstrToObject(obj, "track", curr->trackStatus)) {
 			RET_NULL(obj);
 		}
 	}
@@ -456,14 +431,6 @@ static const struct item items[HUD_ITEM_COUNT] = {
  * @param prev Previous frame HUD data.
  */
 cJSON* hudToJSON(cJSON* obj, const HUD* curr, const HUD* prev) {
-	// now for some windows-flavoured string fun
-	// compare if a previous frame was provided then convert to a multi-byte char*
-	if (!prev || wcscmp(prev->trackStatus, curr->trackStatus) != 0) {
-		if (!addWstrToObject(obj, "trackStatus", curr->trackStatus)) {
-			RET_NULL(obj);
-		}
-	}
-
 	INT_2_OBJ_CMP(obj, "position", prev, prev->position, curr->position);
 	FLOAT_2_OBJ_CMP(obj, "distanceTraveled", prev, prev->distanceTraveled, curr->distanceTraveled);
 	INT_2_OBJ_CMP(obj, "laps", prev, prev->completedLaps, curr->completedLaps);
