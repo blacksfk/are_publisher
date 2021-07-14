@@ -283,7 +283,7 @@ DWORD WINAPI procedure(void* arg) {
 		}
 
 	#ifdef RECORD_DATA
-		fprintf(out, "\t%s,", json);
+		fprintf(out, "\t%s,\n", json);
 	#endif
 
 	#ifdef DISABLE_BROADCAST
