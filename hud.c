@@ -451,16 +451,11 @@ static const struct item items[HUD_ITEM_COUNT] = {
  * Adds the sub-objects above along with: trackStatus, position, distanceTraveled,
  * laps, isBoxed, isInPitLane, mandatoryPitDone, rainTyres, tyreCompound.
  *
- * @param  curr Current frame HUD data.
- * @param  prev Previous frame HUD data.
+ * @param obj  Object to add values to.
+ * @param curr Current frame HUD data.
+ * @param prev Previous frame HUD data.
  */
-cJSON* hudToJSON(const HUD* curr, const HUD* prev) {
-	cJSON* obj = cJSON_CreateObject();
-
-	if (!obj) {
-		return NULL;
-	}
-
+cJSON* hudToJSON(cJSON* obj, const HUD* curr, const HUD* prev) {
 	// now for some windows-flavoured string fun
 	// compare if a previous frame was provided then convert to a multi-byte char*
 	if (!prev || wcscmp(prev->trackStatus, curr->trackStatus) != 0) {

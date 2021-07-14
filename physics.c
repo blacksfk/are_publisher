@@ -301,47 +301,42 @@ static const struct item items[PHYSICS_ITEM_COUNT] = {
  * values between frames will result in the key and its value being excluded
  * from the JSON object in an effort to save bandwidth.
  *
+ * @param obj  Object to add values to.
  * @param curr Current frame Physics data.
  * @param prev Previous frame Physics data.
  */
-cJSON* physicsToJSON(const Physics* curr, const Physics* prev) {
-	cJSON* physics = cJSON_CreateObject();
+cJSON* physicsToJSON(cJSON* obj, const Physics* curr, const Physics* prev) {
+	FLOAT_2_OBJ_CMP(obj, "speed", prev, prev->speed, curr->speed);
+	INT_2_OBJ_CMP(obj, "gear", prev, prev->gear, curr->gear);
 
-	if (!physics) {
-		return NULL;
-	}
-
-	FLOAT_2_OBJ_CMP(physics, "speed", prev, prev->speed, curr->speed);
-	INT_2_OBJ_CMP(physics, "gear", prev, prev->gear, curr->gear);
-
-	FLOAT_2_OBJ_CMP(physics, "tcIntervention", prev,
+	FLOAT_2_OBJ_CMP(obj, "tcIntervention", prev,
 		prev->tcIntervention, curr->tcIntervention);
 
-	FLOAT_2_OBJ_CMP(physics, "absIntervention", prev,
+	FLOAT_2_OBJ_CMP(obj, "absIntervention", prev,
 		prev->absIntervention, curr->absIntervention);
 
-	FLOAT_2_OBJ_CMP(physics, "fuelRemaining", prev,
+	FLOAT_2_OBJ_CMP(obj, "fuelRemaining", prev,
 		prev->fuelRemaining, curr->fuelRemaining);
 
 	// sub-objects
 	for (int i = 0; i < PHYSICS_ITEM_COUNT; i++) {
-		cJSON* obj = items[i].create(curr, prev);
+		cJSON* item = items[i].create(curr, prev);
 
-		if (!obj) {
-			RET_NULL(physics);
+		if (!item) {
+			RET_NULL(obj);
 		}
 
-		if (cJSON_GetArraySize(obj) > 0) {
-			if (!cJSON_AddItemToObject(physics, items[i].key, obj)) {
-				cJSON_Delete(physics);
+		if (cJSON_GetArraySize(item) > 0) {
+			if (!cJSON_AddItemToObject(obj, items[i].key, item)) {
 				cJSON_Delete(obj);
+				cJSON_Delete(item);
 
 				return NULL;
 			}
 		}
 	}
 
-	return physics;
+	return obj;
 }
 
 /**

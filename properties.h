@@ -94,7 +94,7 @@ typedef struct properties {
 	wchar_t wetTyreName[33];
 } Properties;
 
-cJSON* propertiesToJSON(const Properties*);
+cJSON* propertiesToJSON(cJSON*, const Properties*);
 bool propertiesUpdated(const Properties* a, const Properties* b);
 
 #endif

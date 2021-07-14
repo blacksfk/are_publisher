@@ -114,37 +114,17 @@ static char* toJSON(struct memMaps prev, struct memMaps curr, bool sendProps) {
 	}
 
 	// convert HUD parameters to a JSON object
-	cJSON* hud = hudToJSON(curr.hud, prev.hud);
+	obj = hudToJSON(obj, curr.hud, prev.hud);
 
-	if (!hud) {
+	if (!obj) {
 		// if memory isn't being allocated something is seriously wrong
-		cJSON_Delete(obj);
-
-		return NULL;
-	}
-
-	// add it to the parent object
-	if (!cJSON_AddItemToObject(obj, "hud", hud)) {
-		cJSON_Delete(hud);
-		cJSON_Delete(obj);
-
 		return NULL;
 	}
 
 	// convert physics parameters to a JSON object
-	cJSON* physics = physicsToJSON(curr.physics, prev.physics);
+	obj = physicsToJSON(obj, curr.physics, prev.physics);
 
-	if (!physics) {
-		cJSON_Delete(obj);
-
-		return NULL;
-	}
-
-	// add it to the parent
-	if (!cJSON_AddItemToObject(obj, "physics", physics)) {
-		cJSON_Delete(physics);
-		cJSON_Delete(obj);
-
+	if (!obj) {
 		return NULL;
 	}
 
@@ -153,16 +133,9 @@ static char* toJSON(struct memMaps prev, struct memMaps curr, bool sendProps) {
 	// the properties don't need to be checked every time because they
 	// are only updated in shared memory if the user changed sessions
 	if (sendProps) {
-		cJSON* props = propertiesToJSON(curr.props);
+		obj = propertiesToJSON(obj, curr.props);
 
-		if (!props) {
-			return NULL;
-		}
-
-		if (!cJSON_AddItemToObject(obj, "properties", props)) {
-			cJSON_Delete(obj);
-			cJSON_Delete(props);
-
+		if (!obj) {
 			return NULL;
 		}
 	}

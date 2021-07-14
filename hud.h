@@ -334,7 +334,7 @@ typedef struct hud {
 	int strategyTyreSet;
 } HUD;
 
-cJSON* hudToJSON(const HUD*, const HUD*);
+cJSON* hudToJSON(cJSON*, const HUD*, const HUD*);
 const wchar_t* wstrStatus(Status);
 
 #endif

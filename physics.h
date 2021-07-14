@@ -236,7 +236,7 @@ typedef struct physics {
 	float absVibration;
 } Physics;
 
-cJSON* physicsToJSON(const Physics*, const Physics*);
+cJSON* physicsToJSON(cJSON*, const Physics*, const Physics*);
 bool physicsIsInCar(const Physics*);
 
 #ifdef DEBUG

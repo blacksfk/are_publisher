@@ -99,13 +99,7 @@ static const struct item items[PROPS_ITEM_COUNT] = {
  * Properties contains static information and is only changed on a new instance
  * initialisation. Eg. when the player joins a server or creates a new weekend etc.
  */
-cJSON* propertiesToJSON(const Properties* props) {
-	cJSON* obj = cJSON_CreateObject();
-
-	if (!obj) {
-		return NULL;
-	}
-
+cJSON* propertiesToJSON(cJSON* obj, const Properties* props) {
 	INT_2_OBJ(obj, "sessions", props->sessions);
 
 	if (!addWstrToObject(obj, "sharedMemVer", props->sharedMemVer)) {
