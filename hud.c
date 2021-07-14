@@ -464,13 +464,6 @@ cJSON* hudToJSON(cJSON* obj, const HUD* curr, const HUD* prev) {
 		}
 	}
 
-	// would this ever change?
-	if (!prev || wcscmp(prev->tyreCompound, curr->tyreCompound) != 0) {
-		if (!addWstrToObject(obj, "tyreCompound", curr->tyreCompound)) {
-			RET_NULL(obj);
-		}
-	}
-
 	INT_2_OBJ_CMP(obj, "position", prev, prev->position, curr->position);
 	FLOAT_2_OBJ_CMP(obj, "distanceTraveled", prev, prev->distanceTraveled, curr->distanceTraveled);
 	INT_2_OBJ_CMP(obj, "laps", prev, prev->completedLaps, curr->completedLaps);
