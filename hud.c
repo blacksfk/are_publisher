@@ -10,7 +10,7 @@ struct item {
 // to (2^31)-1 (i can't make sense of why this specific value).
 // In order to mitigate sending garbage values like described above: if the
 // time is greater than MAX_TIME, -1 is sent is sent instead.
-#define MAX_TIME 6000
+#define MAX_TIME 600000
 
 #define LAPTIME(o, k, p, a, b) do {\
 	if (!prev || a != b) {\
