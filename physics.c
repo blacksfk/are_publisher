@@ -33,10 +33,10 @@ static cJSON* createPadWear(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	FLOAT_2_OBJ_CMP(obj, "fl", prev, prev->padWear[W_FL], curr->padWear[W_FL]);
-	FLOAT_2_OBJ_CMP(obj, "fr", prev, prev->padWear[W_FR], curr->padWear[W_FR]);
-	FLOAT_2_OBJ_CMP(obj, "rl", prev, prev->padWear[W_RL], curr->padWear[W_RL]);
-	FLOAT_2_OBJ_CMP(obj, "rr", prev, prev->padWear[W_RR], curr->padWear[W_RR]);
+	FLOAT_2_OBJ_CMP(obj, "fl", prev, prev->padDepth[W_FL], curr->padDepth[W_FL]);
+	FLOAT_2_OBJ_CMP(obj, "fr", prev, prev->padDepth[W_FR], curr->padDepth[W_FR]);
+	FLOAT_2_OBJ_CMP(obj, "rl", prev, prev->padDepth[W_RL], curr->padDepth[W_RL]);
+	FLOAT_2_OBJ_CMP(obj, "rr", prev, prev->padDepth[W_RR], curr->padDepth[W_RR]);
 
 	return obj;
 }
@@ -48,10 +48,10 @@ static cJSON* createDiscWear(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	FLOAT_2_OBJ_CMP(obj, "fl", prev, prev->discWear[W_FL], curr->discWear[W_FL]);
-	FLOAT_2_OBJ_CMP(obj, "fr", prev, prev->discWear[W_FR], curr->discWear[W_FR]);
-	FLOAT_2_OBJ_CMP(obj, "rl", prev, prev->discWear[W_RL], curr->discWear[W_RL]);
-	FLOAT_2_OBJ_CMP(obj, "rr", prev, prev->discWear[W_RR], curr->discWear[W_RR]);
+	FLOAT_2_OBJ_CMP(obj, "fl", prev, prev->rotorDepth[W_FL], curr->rotorDepth[W_FL]);
+	FLOAT_2_OBJ_CMP(obj, "fr", prev, prev->rotorDepth[W_FR], curr->rotorDepth[W_FR]);
+	FLOAT_2_OBJ_CMP(obj, "rl", prev, prev->rotorDepth[W_RL], curr->rotorDepth[W_RL]);
+	FLOAT_2_OBJ_CMP(obj, "rr", prev, prev->rotorDepth[W_RR], curr->rotorDepth[W_RR]);
 
 	return obj;
 }
@@ -88,16 +88,16 @@ static cJSON* createBrakeCompound(const Physics* curr, const Physics* prev) {
 
 struct item brakeItems[PHYSICS_BRAKE_ITEM_COUNT] = {
 	{"compound", &createBrakeCompound},
-	{"padWear", &createPadWear},
-	{"discWear", &createDiscWear},
+	{"padDepth", &createPadWear},
+	{"rotorDepth", &createDiscWear},
 	{"temp", &createBrakeTemp}
 };
 
 /**
  * bias, pressure, pressure.fl, pressure.fr, pressure.rl, pressure.rr,
  * compound, compound.front, compound.rear,
- * padWear, padWear.fl, padWear.fr, padWear.rl, padWear.rr,
- * discWear, discWear.fl, discWear.fr, discWear.rl, discWear.rr,
+ * padDepth, padDepth.fl, padDepth.fr, padDepth.rl, padDepth.rr,
+ * rotorDepth, rotorDepth.fl, rotorDepth.fr, rotorDepth.rl, rotorDepth.rr,
  * temp, temp.fl, temp.fr, temp.rl, temp.rr.
  *
  * @param curr Current frame Physics data.
@@ -426,11 +426,11 @@ void printPhysics(const Physics* p, FILE* out) {
 		p->brakeTemp[W_FL], p->brakeTemp[W_FR],
 		p->brakeTemp[W_RL], p->brakeTemp[W_RR],
 
-		p->padWear[W_FL], p->padWear[W_FR],
-		p->padWear[W_RL], p->padWear[W_RR],
+		p->padDepth[W_FL], p->padDepth[W_FR],
+		p->padDepth[W_RL], p->padDepth[W_RR],
 
-		p->discWear[W_FL], p->discWear[W_FR],
-		p->discWear[W_RL], p->discWear[W_RR]
+		p->rotorDepth[W_FL], p->rotorDepth[W_FR],
+		p->rotorDepth[W_RL], p->rotorDepth[W_RR]
 	);
 }
 #endif

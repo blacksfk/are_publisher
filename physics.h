@@ -214,11 +214,11 @@ typedef struct physics {
 	int frontBrakeCompound;
 	int rearBrakeCompound;
 
-	// brake pad wear (FL, FR, RL, RR)
-	float padWear[4];
+	// brake pad depth (FL, FR, RL, RR)
+	float padDepth[4];
 
-	// brake rotor wear (FL, FR, RL, RR)
-	float discWear[4];
+	// brake rotor depth (FL, FR, RL, RR)
+	float rotorDepth[4];
 
 	// whether or not the ignition is on
 	int ignitionOn;
