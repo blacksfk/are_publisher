@@ -78,8 +78,13 @@ static cJSON* createBrakeCompound(const Physics* curr, const Physics* prev) {
 		return NULL;
 	}
 
-	INT_2_OBJ_CMP(obj, "front", prev, prev->frontBrakeCompound, curr->frontBrakeCompound);
-	INT_2_OBJ_CMP(obj, "rear", prev, prev->rearBrakeCompound, curr->rearBrakeCompound);
+	if (!prev || prev->frontBrakeCompound != curr->frontBrakeCompound) {
+		INT_2_OBJ(obj, "front", curr->frontBrakeCompound + 1);
+	}
+
+	if (!prev || prev->rearBrakeCompound != curr->rearBrakeCompound) {
+		INT_2_OBJ(obj, "rear", curr->rearBrakeCompound + 1);
+	}
 
 	return obj;
 }

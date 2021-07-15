@@ -272,7 +272,7 @@ let complete = {
 		bias: 0.0,
 
 		// brake pad compound
-		// n: pad (n+1)
+		// n: pad n
 		compound: {
 			front: 0,
 			rear: 0,
