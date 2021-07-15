@@ -137,8 +137,11 @@ typedef struct hud {
 	// current track sector
 	int currSectorIndex;
 
-	// previous sector in milliseconds
-	int prevSectorTime;
+	// cumulative time that updates with the sector time when
+	// that sector is complete
+	// unfortunately it is completely useless because it gets set to 0
+	// once a lap has been completed
+	int cumulativeSectorTime;
 
 	// duplicate of completedLaps
 	int numberOfLaps;

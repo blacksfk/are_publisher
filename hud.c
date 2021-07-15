@@ -44,7 +44,6 @@ static cJSON* createLaptimes(const HUD* curr, const HUD* prev) {
 
 	INT_2_OBJ_CMP(obj, "currSectorIndex", prev, prev->currSectorIndex, curr->currSectorIndex);
 	INT_2_OBJ_CMP(obj, "currSector", prev, prev->currSectorTime, curr->currSectorTime);
-	INT_2_OBJ_CMP(obj, "prevSector", prev, prev->prevSectorTime, curr->prevSectorTime);
 
 	BOOL_2_OBJ_CMP(obj, "isDeltaPositive", prev, prev->isDeltaPositive, curr->isDeltaPositive);
 	BOOL_2_OBJ_CMP(obj, "isValidLap", prev, prev->isValidLap, curr->isValidLap);

@@ -80,9 +80,6 @@ let complete = {
 		// current sector time expressed in milliseconds
 		currSector: 0,
 
-		// previous sector time expressed in milliseconds
-		prevSector: 0,
-
 		// whether or not the delta is positive
 		isDeltaPositive: false,
 
