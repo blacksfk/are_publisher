@@ -9,14 +9,12 @@ struct item {
 // for no apparent reason, kunos have decided to set invalid laptime values
 // to (2^31)-1 (i can't make sense of why this specific value).
 // In order to mitigate sending garbage values like described above: if the
-// time is greater than MAX_TIME, -1 is sent is sent instead.
+// time is greater than MAX_TIME, then no value is sent instead.
 #define MAX_TIME 600000
 
 #define LAPTIME(o, k, p, a, b) do {\
 	if (!prev || a != b) {\
-		if (b > MAX_TIME) {\
-			INT_2_OBJ(o, k, -1);\
-		} else {\
+		if (b < MAX_TIME) {\
 			INT_2_OBJ(o, k, b);\
 		}\
 	}\
