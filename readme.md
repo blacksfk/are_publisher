@@ -94,7 +94,7 @@ let complete = {
 	electronics: {
 		// TC1
 		// 0: off
-		// n: level
+		// n: level n
 		tc: 0,
 
 		// TC2
@@ -137,7 +137,7 @@ let complete = {
 		// one of: "Practice", "Qualifying", "Race", "Hot Lap", "Hot Stint", "Super Pole", "Unknown"
 		type: "",
 
-		// session time remaning expressed in milliseconds
+		// session time remaining expressed in milliseconds
 		timeLeft: 0.0,
 
 		// cars on the server
