@@ -43,9 +43,9 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 	PeekMessageW(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
 
 	// create a curl easy handle
-	CURL* curl = curl_easy_init();
+	a->curl = curl_easy_init();
 
-	if (!curl) {
+	if (!a->curl) {
 		return ARE_CURL;
 	}
 
@@ -70,18 +70,19 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 	// create the password header string
 	a->pwHeader = createPasswordHeader(password);
 
-	// temporary strings no longer required
-	ATTR_CLEANUP(address, channel, password);
-
 	if (!a->pwHeader) {
 		// out of memory
 		freeAttributes(*a);
+		ATTR_CLEANUP(address, channel, password);
 
 		return ARE_OUT_OF_MEM;
 	}
 
 	// initialise the curl handle with the required parameters
-	a->headers = publishInit(curl, address, channel, a->pwHeader);
+	a->headers = publishInit(a->curl, address, channel, a->pwHeader);
+
+	// temporary strings no longer required
+	ATTR_CLEANUP(address, channel, password);
 
 	if (!a->headers) {
 		// out of memory
