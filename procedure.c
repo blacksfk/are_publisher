@@ -106,7 +106,7 @@ static bool terminate() {
  * Convert the data in the memory maps to a non-formatted JSON
  * string and handle associated errors.
  */
-static char* toJSON(struct memMaps prev, struct memMaps curr, bool sendProps) {
+static char* toJSON(struct memMaps prev, struct memMaps curr) {
 	cJSON* obj = cJSON_CreateObject();
 
 	if (!obj) {
@@ -132,7 +132,7 @@ static char* toJSON(struct memMaps prev, struct memMaps curr, bool sendProps) {
 	// i.e. the user changed sessions
 	// the properties don't need to be checked every time because they
 	// are only updated in shared memory if the user changed sessions
-	if (sendProps) {
+	if (!prev.props) {
 		obj = propertiesToJSON(obj, curr.props);
 
 		if (!obj) {
@@ -223,6 +223,15 @@ static DWORD push(struct attributes a, char* json) {
 	return 0;
 }
 
+// quick hack to get a complete data set on first run or when
+// the user gets back into the car
+// TODO: refactor to not use this (a better solution required)
+static const struct memMaps nullPrev = {
+	.hud = NULL,
+	.props = NULL,
+	.physics = NULL
+};
+
 /**
  * Main loop. Implements ThreadProc.
  * @param  arg Cast to InstanceData*
@@ -253,6 +262,10 @@ DWORD WINAPI procedure(void* arg) {
 	fprintf(out, "[\n");
 #endif
 
+	// complete data set on the first run and any time the user
+	// gets back into the car
+	bool completeData = true;
+
 	while (!terminate()) {
 	#ifdef DEBUG
 		wprintf(L"Current status: %ls\n", wstrStatus(data->sm->curr.hud->status));
@@ -262,19 +275,27 @@ DWORD WINAPI procedure(void* arg) {
 		if (!physicsIsInCar(data->sm->curr.physics)) {
 			// wait until the player is in the car
 			Sleep(SLEEP_DURATION);
+
+			// get the complete data when the player gets back into the car again
+			completeData = true;
 			continue;
 		}
 
 		// get a time stamp to measure the length of the process
 		ULONGLONG start = GetTickCount64();
+		char* json = NULL;
 
-		// get a (delta) JSON string of the shared memory values
-		char* json = toJSON(
-			data->sm->prev,
-			data->sm->curr,
-			!data->sm->prev.props ||
-			propertiesUpdated(data->sm->prev.props, data->sm->curr.props)
-		);
+		if (completeData) {
+			// get the complete data by passing NULL for the previous
+			// frame
+			json = toJSON(nullPrev, data->sm->curr);
+
+			// only send delta data until the player gets out and then back in
+			completeData = false;
+		} else {
+			// get delta data by passing the previous frame
+			json = toJSON(data->sm->prev, data->sm->curr);
+		}
 
 		if (!json) {
 			// out of memory
