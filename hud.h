@@ -122,6 +122,9 @@ typedef struct hud {
 
 	// lap times expressed in milliseconds
 	int currLapTime;
+
+	// when on the first lap both prevLapTime and bestLapTime will be bogus values
+	// something like (2^31)-1
 	int prevLapTime;
 	int bestLapTime;
 
@@ -258,6 +261,7 @@ typedef struct hud {
 	wchar_t strEstimatedLap[15];
 
 	// estimated lap time expressed in milliseconds
+	// on the first lap, the estimated time will be a bogus value: (2^31)-1
 	int estimatedLapTime;
 
 	// whether or not the delta is positive
