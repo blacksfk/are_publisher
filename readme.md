@@ -63,15 +63,17 @@ let complete = {
 		curr: 0,
 
 		// previous lap time expressed in milliseconds
+		// only present when a lap has been completed
+		// to be used as the source of truth for the previous lap time
 		prev: 0,
 
-		// best session lap time expressed in milliseconds
+		// session best lap time expressed in milliseconds
 		best: 0,
 
 		// estimated lap time expressed in milliseconds
 		estimated: 0,
 
-		// best stint lap delta expressed in milliseconds
+		// stint best lap delta expressed in milliseconds
 		delta: 0,
 
 		// current sector. i.e. sector (n+1)
@@ -84,7 +86,12 @@ let complete = {
 		isDeltaPositive: false,
 
 		// whether or not the current lap is valid
-		isValidLap: false
+		isValidLap: false,
+
+		// previous sector time expressed in milliseconds
+		// only present when a sector has been completed
+		// to be used as the source of truth for the previous sector time
+		prevSector: 0
 	},
 
 	// user adjustable car settings (while driving)
@@ -354,7 +361,8 @@ let complete = {
 	},
 
 	/**
-	 * Static parameters - these should only change if the user changes servers
+	 * Static parameters - these are only present when the user gets back into the car
+	 * or changes sessions (which are the same thing from a data perspective)
 	 */
 	// no. of sessions for this weekend
 	sessions: 0,
