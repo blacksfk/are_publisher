@@ -12,14 +12,6 @@ struct item {
 // time is greater than MAX_TIME, then no value is sent instead.
 #define MAX_TIME 600000
 
-#define LAPTIME(o, k, p, a, b) do {\
-	if (!prev || a != b) {\
-		if (b < MAX_TIME) {\
-			INT_2_OBJ(o, k, b);\
-		}\
-	}\
-} while (0)
-
 /**
  * prev, best, curr, delta, estimated, currSector, currSectorIndex,
  * prevSector, isDeltaPositive, isValidLap.
@@ -34,11 +26,38 @@ static cJSON* createLaptimes(const HUD* curr, const HUD* prev) {
 		return NULL;
 	}
 
-	LAPTIME(obj, "curr", prev, prev->currLapTime, curr->currLapTime);
-	LAPTIME(obj, "prev", prev, prev->prevLapTime, curr->prevLapTime);
-	LAPTIME(obj, "best", prev, prev->bestLapTime, curr->bestLapTime);
-	LAPTIME(obj, "estimated", prev, prev->estimatedLapTime,
-		curr->estimatedLapTime);
+	// always add the current lap time
+	// it's always increasing, even when the car is in the pits
+	INT_2_OBJ(obj, "curr", curr->currLapTime);
+
+	// always add the estimated lap time
+	// prevent adding bogus values greater than MAX_TIME
+	if (curr->estimatedLapTime < MAX_TIME) {
+		INT_2_OBJ(obj, "estimated", curr->estimatedLapTime);
+	}
+
+	// only add the previous laptime and sector data if prev is not NULL
+	if (prev) {
+		if (curr->completedLaps > prev->completedLaps) {
+			// new lap started
+			// this should never be a bogus value because it is only added when
+			// completedLaps differs (and therefore this should be set appropriately)
+			INT_2_OBJ(obj, "prev", curr->prevLapTime);
+
+			// get the last sector time by subtracting the cumulative sector time from
+			// the previous lap time
+			INT_2_OBJ(obj, "prevSector", curr->prevLapTime - prev->cumulativeSectorTime);
+		} else if (curr->currSectorIndex > prev->currSectorIndex) {
+			// new sector (but same lap)
+			// get the exact previous sector time by subtracting the cumulative time
+			INT_2_OBJ(obj, "prevSector", curr->currLapTime - curr->cumulativeSectorTime);
+		}
+	}
+
+	// prevent adding bogus values greater than MAX_TIME
+	if (curr->bestLapTime < MAX_TIME) {
+		INT_2_OBJ_CMP(obj, "best", prev, prev->bestLapTime, curr->bestLapTime);
+	}
 
 	INT_2_OBJ_CMP(obj, "delta", prev, prev->delta, curr->delta);
 
