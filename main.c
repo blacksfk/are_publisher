@@ -20,6 +20,9 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 #ifdef DEBUG
 	// debug flag defined so create a terminal for I/O
 	attachTerm();
+#else
+	// redirect stdout to log.txt
+	FILE* log = freopen("log.txt", "w", stdout);
 #endif
 
 	// initialise curl globally
@@ -59,6 +62,8 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 	// debug defined so don't exit until the user requests it
 	wprintf(L"Press enter to exit...\n");
 	fgetwc(stdin);
+#else
+	fclose(log);
 #endif
 
 	return EXIT_SUCCESS;

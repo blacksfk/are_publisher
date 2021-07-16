@@ -188,7 +188,7 @@ static DWORD push(struct attributes a, char* json) {
 		fwprintf(stderr, L"Curl: %ls\n", error);
 	#endif
 
-		msgBoxErr(NULL, ARE_CURL, error);
+		wprintf(L"%d: %ls\n", ARE_CURL, error);
 		free(error);
 
 		return ARE_CURL;
@@ -212,7 +212,7 @@ static DWORD push(struct attributes a, char* json) {
 		fwprintf(stderr, L"Status: %d\nBody: %ls\n", res->status, error);
 	#endif
 
-		msgBoxErr(NULL, ARE_REQ, error);
+		wprintf(L"%d: %ls\n", ARE_REQ, error);
 		free(error);
 
 		return ARE_REQ;

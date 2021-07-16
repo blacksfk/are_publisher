@@ -413,7 +413,7 @@ static int dispatch(HWND wnd, MSG* msg) {
 	}
 
 	// an error occurred
-	msgBoxErr(wnd, (int) GetLastError(), L"GetMessageFailed");
+	wprintf(L"%d: GetMessageFailed()\n", (int) GetLastError());
 
 	return -1;
 }
@@ -421,26 +421,19 @@ static int dispatch(HWND wnd, MSG* msg) {
 /**
  * Show an error message box if the thread exited early.
  */
-static int threadError(HWND wnd, InstanceData* data) {
+static int threadError(InstanceData* data) {
 	DWORD code = 0;
 
 	data->running = false;
 
 	if (!GetExitCodeThread(data->thread, &code)) {
-		msgBoxErr(wnd, ARE_THREAD, L"GetExitCodeThread failed");
+		wprintf(L"%d: GetExitCodeThread failed\n", ARE_THREAD);
 
 		return -1;
 	}
 
-	msgBoxErr(wnd, (int) code, L"Thread exited early");
+	wprintf(L"%d: Thread exited early\n", (int) code);
 
-	if (code == ARE_CURL) {
-		// if there was a problem with curl, then most likely the user
-		// entered something invalid so don't close
-		return 1;
-	}
-
-	// some other more serious error
 	return -1;
 }
 
@@ -482,7 +475,7 @@ static void messageLoop(HWND wnd, InstanceData* data) {
 				// WAIT_OBJECT_0 is returned when the thread
 				// has been signalled
 				// thread exited early due to an error
-				result = threadError(wnd, data);
+				result = threadError(data);
 			}
 
 			break;
@@ -496,7 +489,7 @@ static void messageLoop(HWND wnd, InstanceData* data) {
 			// handled here.
 			// Only WAIT_FAILED should trigger this code path
 			result = -1;
-			msgBoxErr(wnd, (int) GetLastError(), L"MsgWaitForMultipleObjects failed");
+			wprintf(L"%d: MsgWaitForMultipleObjectsEx failed", (int) GetLastError());
 		}
 	} while (result > 0);
 
