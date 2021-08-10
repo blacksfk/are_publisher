@@ -23,6 +23,12 @@ int WINAPI wWinMain(HINSTANCE curr, HINSTANCE prev, wchar_t* args, int cmdShow) 
 #else
 	// redirect stdout to log.txt
 	FILE* log = freopen("log.txt", "w", stdout);
+
+	if (!log) {
+		msgBoxErr(NULL, ARE_FILE, L"Could not create log.txt");
+
+		return EXIT_FAILURE;
+	}
 #endif
 
 	// initialise curl globally
