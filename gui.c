@@ -222,6 +222,73 @@ static LRESULT wmCtlColorStatic(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 }
 
 /**
+ * Creates the thread and waits for it to initialise.
+ */
+static void startProcedure(HWND wnd, InstanceData* data) {
+	// reset the event state
+	if (!ResetEvent(data->threadEvent)) {
+		msgBoxErr(wnd, ARE_EVENT, L"Could not reset event object");
+
+		return;
+	}
+
+	// create a thread
+	data->thread = CreateThread(
+		NULL,           // default security attributes
+		0,              // default stack size
+		&procedure,     // the function
+		data,           // function args
+		0,              // start the thread immediately
+		&data->threadId // thread id
+	);
+
+	if (!data->thread) {
+		msgBoxErr(wnd, ARE_THREAD, L"Failed to create thread");
+
+		return;
+	}
+
+	// wait for thread initilisation to complete or an initilisation
+	// error to be thrown
+	HANDLE handles[2] = {data->thread, data->threadEvent};
+	DWORD waitResult = WaitForMultipleObjects(
+		// how many handles in the array
+		(DWORD) 2,
+		// the handles to wait on
+		handles,
+		// wait on all before returning
+		false,
+		// how long to wait
+		INFINITE
+	);
+
+	if (waitResult == WAIT_FAILED) {
+		msgBoxErr(wnd, ARE_EVENT, L"Waiting for thread initilisation failed");
+
+		return;
+	}
+
+	if (waitResult - WAIT_OBJECT_0 == 0) {
+		// initialisation error
+		 msgBoxErr(wnd, ARE_THREAD, L"Failed to initialise thread");
+
+		 return;
+	}
+
+	SetWindowTextW(data->handlers.btnToggle, BTN_STOP);
+	data->running = true;
+}
+
+/**
+ * Stops the running thread.
+ */
+static void stopProcedure(InstanceData* data) {
+	terminateThread(data->thread, data->threadId);
+	SetWindowTextW(data->handlers.btnToggle, BTN_START);
+	data->running = false;
+}
+
+/**
  * Handles WM_COMMAND.
  */
 static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
@@ -239,82 +306,12 @@ static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 
 	// toggle the state of the program
 	if (!data->running) {
-		// copy text into input buffers
-		if (!getHandlerText(data)) {
-			EnableWindow(btn, true);
-			msgBoxErr(NULL, ARE_USER_INPUT, L"All fields are required");
-
-			return 0;
-		}
-
-		// TODO: validate input
-
-		// reset the event state
-		if (!ResetEvent(data->threadEvent)) {
-			EnableWindow(btn, true);
-			msgBoxErr(wnd, ARE_EVENT, L"Could not reset event object");
-
-			return 0;
-		}
-
-		// create a thread
-		data->thread = CreateThread(
-			NULL,           // default security attributes
-			0,              // default stack size
-			&procedure,     // the function
-			data,           // function args
-			0,              // start the thread immediately
-			&data->threadId // thread id
-		);
-
-		if (!data->thread) {
-			EnableWindow(btn, true);
-			msgBoxErr(wnd, ARE_THREAD, L"Failed to create thread");
-
-			return 0;
-		}
-
-		// wait for thread initilisation to complete or an initilisation
-		// error to be thrown
-		HANDLE handles[2] = {data->thread, data->threadEvent};
-		DWORD waitResult = WaitForMultipleObjects(
-			// how many handles in the array
-			(DWORD) 2,
-			// the handles to wait on
-			handles,
-			// wait on all before returning
-			false,
-			// how long to wait
-			INFINITE
-		);
-
-		if (waitResult == WAIT_FAILED) {
-			EnableWindow(btn, true);
-			msgBoxErr(wnd, ARE_EVENT, L"Waiting for thread initilisation failed");
-
-			return 0;
-		}
-
-		if (waitResult - WAIT_OBJECT_0 == 0) {
-			// initialisation error
-			 EnableWindow(btn, true);
-			 msgBoxErr(wnd, ARE_THREAD, L"Failed to initialise thread");
-
-			 return 0;
-		}
-
-		// change the text of the button to "Stop"
-		SetWindowTextW(btn, BTN_STOP);
+		startProcedure(wnd, data);
 	} else {
-		terminateThread(data->thread, data->threadId);
-
-		// change the text of the button to "Start"
-		SetWindowTextW(btn, BTN_START);
+		stopProcedure(data);
 	}
 
-	// re-enable the button and toggle the state
 	EnableWindow(btn, true);
-	data->running = !data->running;
 
 	return 0;
 }
