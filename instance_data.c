@@ -13,6 +13,16 @@ InstanceData* createInstanceData(SharedMem* sm) {
 		return NULL;
 	}
 
+	// create event to be signalled by the thread when it is ready
+	data->threadEvent = CreateEventW(NULL, true, false, L"ThreadInitEvent");
+
+	if (!data->threadEvent) {
+		// could not create event object
+		freeInstanceData(data);
+
+		return NULL;
+	}
+
 	// allocate memory for text input controls
 	data->address = malloc(FORM_CTRL_BUF_SIZE);
 	data->channel = malloc(FORM_CTRL_BUF_SIZE);

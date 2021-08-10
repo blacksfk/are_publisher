@@ -39,6 +39,9 @@ typedef struct instanceData {
 
 	// as described above
 	struct formHandlers handlers;
+
+	// processing thread init signal
+	HANDLE threadEvent;
 } InstanceData;
 
 InstanceData* createInstanceData(SharedMem* sm);
