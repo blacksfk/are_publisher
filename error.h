@@ -11,7 +11,8 @@ enum areError {
 	ARE_GUI,
 	ARE_USER_INPUT,
 	ARE_THREAD,
-	ARE_FILE
+	ARE_FILE,
+	ARE_EVENT
 };
 
 #endif
