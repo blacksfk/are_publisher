@@ -249,6 +249,14 @@ static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 
 		// TODO: validate input
 
+		// reset the event state
+		if (!ResetEvent(data->threadEvent)) {
+			EnableWindow(btn, true);
+			msgBoxErr(wnd, ARE_EVENT, L"Could not reset event object");
+
+			return 0;
+		}
+
 		// create a thread
 		data->thread = CreateThread(
 			NULL,           // default security attributes
@@ -264,6 +272,35 @@ static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 			msgBoxErr(wnd, ARE_THREAD, L"Failed to create thread");
 
 			return 0;
+		}
+
+		// wait for thread initilisation to complete or an initilisation
+		// error to be thrown
+		HANDLE handles[2] = {data->thread, data->threadEvent};
+		DWORD waitResult = WaitForMultipleObjects(
+			// how many handles in the array
+			(DWORD) 2,
+			// the handles to wait on
+			handles,
+			// wait on all before returning
+			false,
+			// how long to wait
+			INFINITE
+		);
+
+		if (waitResult == WAIT_FAILED) {
+			EnableWindow(btn, true);
+			msgBoxErr(wnd, ARE_EVENT, L"Waiting for thread initilisation failed");
+
+			return 0;
+		}
+
+		if (waitResult - WAIT_OBJECT_0 == 0) {
+			// initialisation error
+			 EnableWindow(btn, true);
+			 msgBoxErr(wnd, ARE_THREAD, L"Failed to initialise thread");
+
+			 return 0;
 		}
 
 		// change the text of the button to "Stop"

@@ -89,6 +89,11 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 		freeAttributes(*a);
 	}
 
+	// signal the event in order for the parent to proceed
+	if (!SetEvent(data->threadEvent)) {
+		return ARE_EVENT;
+	}
+
 	// initialised successfully
 	return 0;
 }
