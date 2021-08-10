@@ -10,7 +10,8 @@ enum areError {
 	ARE_DURATION,
 	ARE_GUI,
 	ARE_USER_INPUT,
-	ARE_THREAD
+	ARE_THREAD,
+	ARE_FILE
 };
 
 #endif
