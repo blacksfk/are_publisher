@@ -232,6 +232,12 @@ static void startProcedure(HWND wnd, InstanceData* data) {
 		return;
 	}
 
+	if (!getHandlerText(data)) {
+		msgBoxErr(wnd, ARE_USER_INPUT, L"All fields are required");
+
+		return;
+	}
+
 	// create a thread
 	data->thread = CreateThread(
 		NULL,           // default security attributes
