@@ -49,6 +49,15 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 		return ARE_CURL;
 	}
 
+#ifdef CURL_SKIP_VERIFY
+	curl_easy_setopt(a->curl, CURLOPT_SSL_VERIFYPEER, 0L);
+#endif
+
+#ifdef DEBUG
+	wprintf(L"address: %ls\nchannel ID: %ls\npassword: %ls\n",
+			data->address, data->channel, data->password);
+#endif
+
 	// convert the wide char buffers into char buffers
 	char* address = wstrToStr(data->address);
 	char* channel = wstrToStr(data->channel);
@@ -61,11 +70,6 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 
 		return ARE_OUT_OF_MEM;
 	}
-
-#ifdef DEBUG
-	wprintf(L"address: %ls\nchannel ID: %ls\npassword: %ls\n",
-			data->address, data->channel, data->password);
-#endif
 
 	// create the password header string
 	a->pwHeader = createPasswordHeader(password);
@@ -317,6 +321,7 @@ DWORD WINAPI procedure(void* arg) {
 		// json no longer required
 		free(json);
 	#else
+		printf("broadcasting...\n");
 		// send the json to the server
 		result = push(attr, json);
 
