@@ -9,7 +9,7 @@
 #define HEADER_CHAN_PW "Channel-Password: "
 
 #define CHAN_ENDPOINT "/channel"
-#define PUB_ENDPOINT "publish/"
+#define PUB_ENDPOINT "/publish"
 
 char* createPasswordHeader(const char* password);
 struct curl_slist* publishInit(CURL* curl, const char* base, const char* cID, const char* pw);

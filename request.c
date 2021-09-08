@@ -91,42 +91,93 @@ static struct curl_slist* attachHeaders(CURL* curl, int count, ...) {
 	return headers;
 }
 
+// initial number of bytes to allocate
+#define INIT_URL_STR_LEN 64
+
 /**
- * Construct a URL to <base>/publish/<cID>.
- * Trailing slash on the base URL is handled appropriately.
- * @param  base Eg. "localhost:3000".
- * @param  cID  The channel ID.
- * @return      A heap allocated string.
+ * Create a URL from a variable number of strings. The first is assumed
+ * to the base URL. The strings following are assumed to apart of the path.
+ * Eg.:
+ * createURL(5, "https://example.com", "/the", "answer/", "/is/", "42")
+ * -> "https://example.com/the/answer/is/42"
+ * @param  count The number of strings provided.
+ * @return       A heap-allocated string.
  */
-static char* createPublishURL(const char* base, const char* cID) {
-	size_t baseLen = strlen(base);
-	size_t bytes = baseLen + strlen(cID) + strlen(PUB_ENDPOINT) + 1;
-	bool trailingSlash = (base[baseLen - 1] == '/');
-
-	if (!trailingSlash) {
-		// add an extra byte because the base url does
-		// not contain a trailing slash
-		bytes += 1;
-	}
-
-	char* url = malloc(bytes);
+static char* createURL(int count, ...) {
+	va_list argList;
+	size_t bytes = 0, cap = INIT_URL_STR_LEN;
+	char* url = malloc(cap);
 
 	if (!url) {
 		// out of memory
 		return NULL;
 	}
 
-	// concatenate the URL
-	strcpy(url, base);
+	va_start(argList, count);
 
-	if (!trailingSlash) {
-		// append a slash after the base URL and null terminator for strcat
-		url[baseLen] = '/';
-		url[baseLen + 1] = '\0';
+	// loop through the provided strings
+	for (int i = 0; i < count; i++) {
+		char* str = va_arg(argList, char*);
+		size_t len = strlen(str);
+		bool appendLeading = (str[0] != '/' && i != 0);
+
+		if (str[len - 1] == '/') {
+			// skip the trailing slash
+			len -= 1;
+		}
+
+		size_t newLen = len + bytes;
+
+		if (appendLeading) {
+			// add an extra byte to accomodate a leading slash
+			newLen += 1;
+		}
+
+		if (newLen > cap) {
+			// allocate another INIT_URL_STR_LEN bytes
+			cap += INIT_URL_STR_LEN;
+
+			char* ptr = realloc(url, cap);
+
+			if (!ptr) {
+				// re-allocation failed
+				free(url);
+				va_end(argList);
+
+				return NULL;
+			}
+
+			url = ptr;
+		}
+
+		if (appendLeading) {
+			// append a slash before copying the string
+			url[bytes++] = '/';
+		}
+
+		// copy the string
+		for (size_t j = 0; j < len; j++) {
+			url[bytes + j] = str[j];
+		}
+
+		bytes += len;
 	}
 
-	strcat(url, PUB_ENDPOINT);
-	strcat(url, cID);
+	va_end(argList);
+
+	if (bytes == cap) {
+		// add a byte for the null terminator
+		char* ptr = realloc(url, cap + 1);
+
+		if (!ptr) {
+			free(url);
+
+			return NULL;
+		}
+	}
+
+	// append a null terminator
+	url[bytes] = '\0';
 
 	return url;
 }
@@ -171,7 +222,7 @@ struct curl_slist* publishInit(CURL* curl, const char* base,
 		return NULL;
 	}
 
-	char* url = createPublishURL(base, cID);
+	char* url = createURL(3, base, PUB_ENDPOINT, cID);
 
 	if (!url) {
 		curl_easy_reset(curl);
