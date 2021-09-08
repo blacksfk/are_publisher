@@ -238,6 +238,38 @@ struct curl_slist* publishInit(CURL* curl, const char* base,
 }
 
 /**
+ * Get all channels from the API.
+ * @param  curl Curl easy handle.
+ * @param  base The base URL. Eg.: "https://example.com".
+ * @return      Must be freed once consumed.
+ */
+Response* getChannels(CURL* curl, const char* base) {
+	char* url = createURL(3, base, CHAN_ENDPOINT);
+
+	if (!url) {
+		return NULL;
+	}
+
+	// attach the URL
+	curl_easy_setopt(curl, CURLOPT_URL, url);
+	free(url);
+
+	Response* r = createResponse();
+
+	if (!r) {
+		curl_easy_reset(curl);
+
+		return NULL;
+	}
+
+	// send the request
+	r->curlCode = curl_easy_perform(curl);
+	populateResponse(curl, r);
+
+	return r;
+}
+
+/**
  * Sends the JSON body to the already initialised and set URL.
  * @param  curl Curl easy handle. Must be initialised with publishInit.
  * @param  json The JSON string to attach as the request body.
