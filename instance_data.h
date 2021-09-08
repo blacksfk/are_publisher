@@ -16,6 +16,8 @@ struct formHandlers {
 	HWND ctrlChannel;
 	HWND ctrlPassword;
 
+	HWND btnSet;
+	HWND btnRefresh;
 	HWND btnToggle;
 };
 
