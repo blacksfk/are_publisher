@@ -1,6 +1,7 @@
 #ifndef INSTANCE_DATA_H
 #define INSTANCE_DATA_H
 
+#include "channel.h"
 #include "shared_mem.h"
 
 // how much text could you really enter?? 4096 wchar_t characters should be plenty...
@@ -44,9 +45,12 @@ typedef struct instanceData {
 
 	// processing thread init signal
 	HANDLE threadEvent;
+
+	// channel list
+	ChannelList* chanList;
 } InstanceData;
 
-InstanceData* createInstanceData(SharedMem* sm);
+InstanceData* createInstanceData(SharedMem* sm, ChannelList* list);
 void freeInstanceData(InstanceData* data);
 
 #endif
