@@ -73,6 +73,7 @@ cJSON* addWstrToObject(cJSON* obj, char* key, const wchar_t* wstr) {
 void msgBoxErr(HWND parent, int e, const wchar_t* str) {
 	wchar_t msg[MSG_BOX_BUF_SIZE];
 
+	wprintf(L"%d: %ls\n", e, str);
 	swprintf(msg, MSG_BOX_BUF_SIZE, L"%d: %ls.", e, str);
 	MessageBoxW(parent, msg, L"Error", MB_OK | MB_ICONERROR);
 }
