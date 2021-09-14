@@ -14,5 +14,6 @@
 char* createPasswordHeader(const char* password);
 struct curl_slist* publishInit(CURL* curl, const char* base, const char* cID, const char* pw);
 Response* publish(CURL* curl, const char* json);
+Response* getChannels(CURL* curl, const char* base);
 
 #endif
