@@ -21,7 +21,9 @@ conan_basic_setup()
 add_executable(
 	are_publisher
 	WIN32
+	api.c
 	auxiliary.c
+	channel.c
 	gui.c
 	hud.c
 	instance_data.c
