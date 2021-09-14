@@ -262,6 +262,14 @@ Response* getChannels(CURL* curl, const char* base) {
 		return NULL;
 	}
 
+	// set head response data handler
+	curl_easy_setopt(curl, CURLOPT_HEADERDATA, r);
+	curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, &cbHead);
+
+	// set body response data handler
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, r->body);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cbBody);
+
 	// send the request
 	r->curlCode = curl_easy_perform(curl);
 	populateResponse(curl, r);
