@@ -2,3 +2,4 @@
 #cmakedefine DISABLE_BROADCAST
 #cmakedefine RECORD_DATA
 #cmakedefine CURL_SKIP_VERIFY
+#cmakedefine API_URL "@API_URL@"
