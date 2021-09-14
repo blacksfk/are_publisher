@@ -244,7 +244,7 @@ struct curl_slist* publishInit(CURL* curl, const char* base,
  * @return      Must be freed once consumed.
  */
 Response* getChannels(CURL* curl, const char* base) {
-	char* url = createURL(3, base, CHAN_ENDPOINT);
+	char* url = createURL(2, base, CHAN_ENDPOINT);
 
 	if (!url) {
 		return NULL;
