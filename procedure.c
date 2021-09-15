@@ -19,10 +19,9 @@ static void freeAttributes(struct attributes a) {
 /**
  * Free memory allocated for the temporary strings used in initAttributes.
  */
-#define ATTR_CLEANUP(a, b, c) do {\
+#define ATTR_CLEANUP(a, b) do {\
 	free(a);\
 	free(b);\
-	free(c);\
 } while(0)
 
 /**
@@ -54,19 +53,18 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 #endif
 
 #ifdef DEBUG
-	wprintf(L"address: %ls\nchannel ID: %ls\npassword: %ls\n",
-			data->address, data->channel, data->password);
+	wprintf(L"channel ID: %ls\npassword: %ls\n",
+			data->channel, data->password);
 #endif
 
 	// convert the wide char buffers into char buffers
-	char* address = wstrToStr(data->address);
 	char* channel = wstrToStr(data->channel);
 	char* password = wstrToStr(data->password);
 
-	if (!address || !channel || !password) {
+	if (!channel || !password) {
 		// out of memory
 		freeAttributes(*a);
-		ATTR_CLEANUP(address, channel, password);
+		ATTR_CLEANUP(channel, password);
 
 		return ARE_OUT_OF_MEM;
 	}
@@ -77,16 +75,16 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 	if (!a->pwHeader) {
 		// out of memory
 		freeAttributes(*a);
-		ATTR_CLEANUP(address, channel, password);
+		ATTR_CLEANUP(channel, password);
 
 		return ARE_OUT_OF_MEM;
 	}
 
 	// initialise the curl handle with the required parameters
-	a->headers = publishInit(a->curl, address, channel, a->pwHeader);
+	a->headers = publishInit(a->curl, API_URL, channel, a->pwHeader);
 
 	// temporary strings no longer required
-	ATTR_CLEANUP(address, channel, password);
+	ATTR_CLEANUP(channel, password);
 
 	if (!a->headers) {
 		// out of memory
@@ -277,11 +275,6 @@ DWORD WINAPI procedure(void* arg) {
 	bool completeData = true;
 
 	while (!terminate()) {
-	#ifdef DEBUG
-		wprintf(L"Current status: %ls\n", wstrStatus(data->sm->curr.hud->status));
-		printPhysics(data->sm->curr.physics, stdout);
-	#endif
-
 		if (!physicsIsInCar(data->sm->curr.physics)) {
 			// wait until the player is in the car
 			Sleep(SLEEP_DURATION);

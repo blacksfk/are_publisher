@@ -24,11 +24,9 @@ InstanceData* createInstanceData(SharedMem* sm, ChannelList* list) {
 	}
 
 	// allocate memory for text input controls
-	data->address = malloc(FORM_CTRL_BUF_SIZE);
-	data->channel = malloc(FORM_CTRL_BUF_SIZE);
 	data->password = malloc(FORM_CTRL_BUF_SIZE);
 
-	if (!data->address || !data->channel || !data->password) {
+	if (!data->password) {
 		// out of memory
 		freeInstanceData(data);
 
@@ -39,8 +37,6 @@ InstanceData* createInstanceData(SharedMem* sm, ChannelList* list) {
 	size_t count = FORM_CTRL_BUF_SIZE / sizeof(wchar_t);
 
 	// initialise all text input buffers with wchar_t null bytes
-	wmemset(data->address, L'\0', count);
-	wmemset(data->channel, L'\0', count);
 	wmemset(data->password, L'\0', count);
 
 	data->sm = sm;
@@ -48,6 +44,7 @@ InstanceData* createInstanceData(SharedMem* sm, ChannelList* list) {
 	data->running = false;
 	data->thread = NULL;
 	data->threadId = 0;
+	data->channel = NULL;
 
 	return data;
 }
@@ -60,8 +57,6 @@ void freeInstanceData(InstanceData* data) {
 		return;
 	}
 
-	free(data->address);
-	free(data->channel);
 	free(data->password);
 	free(data);
 }

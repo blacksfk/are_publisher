@@ -9,23 +9,22 @@
 
 // struct that groups the window handlers of the form controls
 struct formHandlers {
-	HWND lblAddress;
 	HWND lblChannel;
 	HWND lblPassword;
 
-	HWND ctrlAddress;
 	HWND ctrlChannel;
 	HWND ctrlPassword;
 
-	HWND btnSet;
 	HWND btnRefresh;
 	HWND btnToggle;
 };
 
 typedef struct instanceData {
-	// text input buffers
-	wchar_t* address;
+	// pointer to the selected channel's ID
+	// niether allocated nor de-allocated by instance data functions
 	wchar_t* channel;
+
+	// text input copied from the password window handler
 	wchar_t* password;
 
 	// whether or not the end user has clicked the start button
