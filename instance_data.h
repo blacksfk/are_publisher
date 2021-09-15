@@ -49,7 +49,7 @@ typedef struct instanceData {
 	ChannelList* chanList;
 } InstanceData;
 
-InstanceData* createInstanceData(SharedMem* sm, ChannelList* list);
+InstanceData* createInstanceData(SharedMem* sm);
 void freeInstanceData(InstanceData* data);
 
 #endif

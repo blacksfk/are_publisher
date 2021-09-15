@@ -5,7 +5,7 @@
  * @param  sm
  * @return    Returns NULL if memory could not be allocated.
  */
-InstanceData* createInstanceData(SharedMem* sm, ChannelList* list) {
+InstanceData* createInstanceData(SharedMem* sm) {
 	InstanceData* data = malloc(sizeof(*data));
 
 	if (!data) {
@@ -40,7 +40,7 @@ InstanceData* createInstanceData(SharedMem* sm, ChannelList* list) {
 	wmemset(data->password, L'\0', count);
 
 	data->sm = sm;
-	data->chanList = list;
+	data->chanList = NULL;
 	data->running = false;
 	data->thread = NULL;
 	data->threadId = 0;
@@ -57,6 +57,7 @@ void freeInstanceData(InstanceData* data) {
 		return;
 	}
 
+	freeChannelList(data->chanList);
 	free(data->password);
 	free(data);
 }
