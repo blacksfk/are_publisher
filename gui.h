@@ -6,10 +6,12 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
+#include "api.h"
 #include "procedure.h"
 
 enum buttons {
-	BTN_TOGGLE = 1000
+	BTN_TOGGLE = 1000,
+	BTN_REFRESH
 };
 
 #define WINDOW_CLASS L"are_publisher_class"
@@ -20,14 +22,14 @@ enum buttons {
 
 // main window width and height
 #define WINDOW_W 500
-#define WINDOW_H 200
+#define WINDOW_H 175
 
 // window internal margins
 #define MARGIN_X 10
 #define MARGIN_Y MARGIN_X
 
 // form control parameters
-#define FORM_CTRL_W (WINDOW_W - (MARGIN_X * 4))
+#define FORM_CTRL_W (WINDOW_W - 100 - (MARGIN_X * 4))
 #define FORM_CTRL_H 20
 
 // form label parameters
@@ -36,10 +38,12 @@ enum buttons {
 
 // form button parameters
 #define FORM_BTN_W FORM_CTRL_W
-#define FORM_BTN_H FORM_CTRL_H
+#define FORM_BTN_H (FORM_CTRL_H + 2)
+#define FORM_BTN_I_W (WINDOW_W - 400 - (MARGIN_X * 4))
+#define FORM_BTN_I_MARGIN_X (FORM_CTRL_W + (MARGIN_X * 2))
 
 // gap between form elements
-#define FORM_MARGIN_H 2
+#define FORM_MARGIN_H 5
 
 // the height of one label and control
 #define FORM_GROUP_H (FORM_LBL_H + FORM_MARGIN_H + FORM_CTRL_H + FORM_MARGIN_H)

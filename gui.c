@@ -1,26 +1,14 @@
 #include "gui.h"
 
 /**
- * Copies the input from window handlers into their respective buffers.
+ * Copies the bytes from the password input into a useable buffer.
  * @param  data
  * @return      True if all buffers contain at least one byte and false otherwise.
  */
 static bool getHandlerText(InstanceData* data) {
-	// copy the input from each handle into the respective buffer
+	// copy the input from the password handle into a useable buffer
 	// GetWindowTextW will truncate and append the the wide null terminator
 	// if the input byte count is > FORM_CTRL_BUF_SIZE - 2
-	int a = GetWindowTextW(
-		data->handlers.ctrlAddress,
-		data->address,
-		FORM_CTRL_BUF_SIZE
-	);
-
-	int c = GetWindowTextW(
-		data->handlers.ctrlChannel,
-		data->channel,
-		FORM_CTRL_BUF_SIZE
-	);
-
 	int p = GetWindowTextW(
 		data->handlers.ctrlPassword,
 		data->password,
@@ -28,7 +16,7 @@ static bool getHandlerText(InstanceData* data) {
 	);
 
 	// GetWindowTextW returns the number of characters copied
-	return (a && c && p);
+	return (p > 0);
 }
 
 /**
@@ -38,10 +26,10 @@ static bool getHandlerText(InstanceData* data) {
  * @return          True if all windows were created and false otherwise.
  */
 static bool createControls(HWND parent, struct formHandlers* handlers) {
-	// server address label
-	handlers->lblAddress = CreateWindowW(
+	// channel label
+	handlers->lblChannel = CreateWindowW(
 		L"Static",
-		L"Server address",
+		L"Channel",
 		FORM_LBL_STYLE,
 		MARGIN_X,
 		MARGIN_Y,
@@ -53,11 +41,11 @@ static bool createControls(HWND parent, struct formHandlers* handlers) {
 		NULL
 	);
 
-	// server address input
-	handlers->ctrlAddress = CreateWindowW(
-		L"Edit",
+	// channel input
+	handlers->ctrlChannel = CreateWindowW(
+		L"Combobox",
 		NULL,
-		FORM_CTRL_STYLE,
+		CBS_DROPDOWN | CBS_HASSTRINGS | FORM_CTRL_STYLE,
 		MARGIN_X,
 		MARGIN_Y + FORM_LBL_H + FORM_MARGIN_H,
 		FORM_CTRL_W,
@@ -68,32 +56,17 @@ static bool createControls(HWND parent, struct formHandlers* handlers) {
 		NULL
 	);
 
-	// channel ID label
-	handlers->lblChannel = CreateWindowW(
-		L"Static",
-		L"Channel",
-		FORM_LBL_STYLE,
-		MARGIN_X,
-		MARGIN_Y + FORM_GROUP_H,
-		FORM_LBL_W,
-		FORM_LBL_H,
+	// "refresh" button
+	handlers->btnRefresh = CreateWindowW(
+		L"Button",
+		L"Refresh",
+		FORM_BTN_STYLE,
+		FORM_BTN_I_MARGIN_X,
+		MARGIN_Y + FORM_LBL_H + FORM_MARGIN_H - 1,
+		FORM_BTN_I_W,
+		FORM_BTN_H,
 		parent,
-		NULL,
-		NULL,
-		NULL
-	);
-
-	// channel ID input
-	handlers->ctrlChannel = CreateWindowW(
-		L"Edit",
-		NULL,
-		FORM_CTRL_STYLE,
-		MARGIN_X,
-		MARGIN_Y + FORM_GROUP_H + FORM_LBL_H + FORM_MARGIN_H,
-		FORM_CTRL_W,
-		FORM_CTRL_H,
-		parent,
-		NULL,
+		(HMENU) BTN_REFRESH,
 		NULL,
 		NULL
 	);
@@ -104,7 +77,7 @@ static bool createControls(HWND parent, struct formHandlers* handlers) {
 		L"Channel Password",
 		FORM_LBL_STYLE,
 		MARGIN_X,
-		MARGIN_Y + FORM_GROUP_H * 2,
+		MARGIN_Y + FORM_GROUP_H,
 		FORM_LBL_W,
 		FORM_LBL_H,
 		parent,
@@ -119,7 +92,7 @@ static bool createControls(HWND parent, struct formHandlers* handlers) {
 		NULL,
 		FORM_CTRL_STYLE | ES_PASSWORD,
 		MARGIN_X,
-		MARGIN_Y + (FORM_GROUP_H * 2) + FORM_LBL_H + FORM_MARGIN_H,
+		MARGIN_Y + FORM_GROUP_H + FORM_LBL_H + FORM_MARGIN_H,
 		FORM_CTRL_W,
 		FORM_CTRL_H,
 		parent,
@@ -134,8 +107,8 @@ static bool createControls(HWND parent, struct formHandlers* handlers) {
 		BTN_START,
 		FORM_BTN_STYLE,
 		MARGIN_X,
-		MARGIN_Y + FORM_GROUP_H * 3,
-		FORM_BTN_W,
+		MARGIN_Y + FORM_GROUP_H * 2,
+		FORM_BTN_I_W,
 		FORM_BTN_H,
 		parent,
 		(HMENU) BTN_TOGGLE,
@@ -146,13 +119,12 @@ static bool createControls(HWND parent, struct formHandlers* handlers) {
 	// return true if all of the windows were created successfully
 	// and false otherwise
 	return (
-		handlers->lblAddress &&
 		handlers->lblChannel &&
 		handlers->lblPassword &&
-		handlers->ctrlAddress &&
 		handlers->ctrlChannel &&
 		handlers->ctrlPassword &&
-		handlers->btnToggle
+		handlers->btnToggle &&
+		handlers->btnRefresh
 	);
 }
 
@@ -238,6 +210,24 @@ static void startProcedure(HWND wnd, InstanceData* data) {
 		return;
 	}
 
+	// find channel name in the channel list
+	ChannelNode* node = data->chanList->head;
+	int idx = (int) SendMessageW(data->handlers.ctrlChannel, CB_GETCURSEL, 0, 0);
+
+	if (idx == CB_ERR) {
+		msgBoxErr(wnd, ARE_GUI, L"No item selected in combo box");
+
+		return;
+	}
+
+	// advance to the selected channel
+	for (int i = 0; i < idx; i++) {
+		node = node->next;
+	}
+
+	// set the channel ID
+	data->channel = node->chan->id;
+
 	// create a thread
 	data->thread = CreateThread(
 		NULL,           // default security attributes
@@ -295,13 +285,12 @@ static void stopProcedure(InstanceData* data) {
 }
 
 /**
- * Handles WM_COMMAND.
+ * Handles the start/stop button clicks.
  */
-static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
-	if (w != BTN_TOGGLE) {
-		// something else was clicked; let windows handle it
-		return DefWindowProcW(wnd, msg, w, l);
-	}
+static LRESULT toggleHandler(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+	(void) msg;
+	(void) w;
+	(void) l;
 
 	// extract the struct from the window user data
 	InstanceData* data = (InstanceData*) GetWindowLongPtr(wnd, GWLP_USERDATA);
@@ -320,6 +309,99 @@ static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 	EnableWindow(btn, true);
 
 	return 0;
+}
+
+/**
+ * Update the combo box with new channels from the API.
+ */
+static int refreshChannels(InstanceData* data) {
+	// get all channels from the API
+	cJSON* array;
+	int result = getChannelsJSON(&array);
+
+	if (result != 0) {
+		return result;
+	}
+
+	// create a channel list from the array
+	ChannelList* list = channelListFromJSON(array);
+
+	// no longer need the JSON array
+	cJSON_Delete(array);
+
+	if (!list) {
+		return ARE_OUT_OF_MEM;
+	}
+
+	// free the current channel list and replace it with the new one
+	freeChannelList(data->chanList);
+	data->chanList = list;
+
+	// send all the channel names to the combobox
+	for (ChannelNode* node = list->head; node; node = node->next) {
+		// channel names are already sorted, so just append
+		LRESULT smr = SendMessageW(
+			data->handlers.ctrlChannel,
+			CB_INSERTSTRING,
+			(WPARAM) -1,
+			(LPARAM) node->chan->name);
+
+		if (smr == CB_ERR || smr == CB_ERRSPACE) {
+			return ARE_GUI;
+		}
+	}
+
+	return 0;
+}
+
+/**
+ * Handle refresh button clicks.
+ */
+static LRESULT refreshHandler(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+	(void) msg;
+	(void) w;
+	(void) l;
+
+	InstanceData* data = (InstanceData*) GetWindowLongPtr(wnd, GWLP_USERDATA);
+
+	// disable the button while the update occurs
+	EnableWindow(data->handlers.btnRefresh, false);
+
+	int result = refreshChannels(data);
+
+	if (result != 0) {
+		msgBoxErr(wnd, result, L"Failed to update channels");
+	}
+
+	// re-enable the button
+	EnableWindow(data->handlers.btnRefresh, true);
+
+	return 0;
+}
+
+struct buttonHandler {
+	WPARAM id;
+	LRESULT (*handler)(HWND, UINT, WPARAM, LPARAM);
+};
+
+static const struct buttonHandler btnHandlers[] = {
+	{BTN_TOGGLE, toggleHandler},
+	{BTN_REFRESH, refreshHandler}
+};
+
+static const size_t btnHandlersLen = sizeof(btnHandlers) / sizeof(btnHandlers[0]);
+
+/**
+ * Handles WM_COMMAND.
+ */
+static LRESULT wmCommand(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+	for (int i = 0; i < btnHandlersLen; i++) {
+		if (w == btnHandlers[i].id) {
+			return btnHandlers[i].handler(wnd, msg, w, l);
+		}
+	}
+
+	return DefWindowProcW(wnd, msg, w, l);
 }
 
 /**
@@ -556,6 +638,15 @@ void gui(HINSTANCE h, int cmdShow, InstanceData* data) {
 	// create and add the form controls to the main window
 	if (!createControls(wnd, &data->handlers)) {
 		msgBoxErr(NULL, ARE_GUI, L"Failed to create window controls");
+
+		return;
+	}
+
+	// get the channels from the API and add them to the combobox
+	int result = refreshChannels(data);
+
+	if (result != 0) {
+		msgBoxErr(NULL, result, L"Failed to get channels from API");
 
 		return;
 	}
