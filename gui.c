@@ -345,7 +345,7 @@ static int refreshChannels(InstanceData* data) {
 	for (ChannelNode* node = list->head; node; node = node->next) {
 		// channel names are already sorted, so just append
 		LRESULT smr = SendMessageW(
-			data->handlers.ctrlChannel,
+			cb,
 			CB_INSERTSTRING,
 			(WPARAM) -1,
 			(LPARAM) node->chan->name);
@@ -354,6 +354,9 @@ static int refreshChannels(InstanceData* data) {
 			return ARE_GUI;
 		}
 	}
+
+	// pre-select the first channel in the list
+	SendMessageW(cb, CB_SETCURSEL, (WPARAM) 0, (LPARAM) 0);
 
 	return 0;
 }
