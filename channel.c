@@ -132,10 +132,21 @@ bool insertChannel(ChannelList* list, Channel* chan) {
 		ChannelNode* prev = NULL;
 		ChannelNode* curr = list->head;
 
-		for (; curr && wcscmp(curr->chan->name, chan->name) >= 0;
+		// advance until the strings match or the new channel's name comes
+		// alphabetically before the current node's name or until the end
+		// of the list is reached
+		for (; curr && wcscmp(new->chan->name, curr->chan->name) > 0;
 			prev = curr, curr = curr->next);
 
-		prev->next = new;
+		if (!prev) {
+			// inserting at the start
+			list->head = new;
+		} else {
+			// inserting in the middle or at the end
+			prev->next = new;
+		}
+
+		// insert before the current node or the end
 		new->next = curr;
 	}
 
