@@ -318,10 +318,14 @@ static int refreshChannels(InstanceData* data) {
 	// get all channels from the API
 	cJSON* array;
 	int result = getChannelsJSON(&array);
+	HWND cb = data->handlers.ctrlChannel;
 
 	if (result != 0) {
 		return result;
 	}
+
+	// clear any items currently in the combo box
+	SendMessageW(cb, CB_RESETCONTENT, (WPARAM) 0, (LPARAM) 0);
 
 	// create a channel list from the array
 	ChannelList* list = channelListFromJSON(array);
