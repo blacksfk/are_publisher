@@ -43,9 +43,9 @@ static bool createControls(HWND parent, struct formHandlers* handlers) {
 
 	// channel input
 	handlers->ctrlChannel = CreateWindowW(
-		L"Combobox",
+		L"ComboBox",
 		NULL,
-		CBS_DROPDOWN | CBS_HASSTRINGS | FORM_CTRL_STYLE,
+		CBS_DROPDOWNLIST | CBS_HASSTRINGS | FORM_CTRL_STYLE,
 		MARGIN_X,
 		MARGIN_Y + FORM_LBL_H + FORM_MARGIN_H,
 		FORM_CTRL_W,
