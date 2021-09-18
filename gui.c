@@ -522,7 +522,7 @@ static void setFont(HWND wnd) {
 static int dispatch(HWND wnd, MSG* msg) {
 	// GetMessage doesn't return a bool if it can return -1.
 	// According to MS, a boolean has 3 states
-	int result = GetMessageW(msg, wnd, 0, 0);
+	int result = GetMessageW(msg, NULL, 0, 0);
 
 	// check if the message is a dialog message in order
 	// to provide keyboard TAB functionality
