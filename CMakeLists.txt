@@ -24,6 +24,7 @@ add_executable(
 	api.c
 	auxiliary.c
 	channel.c
+	controls.c
 	gui.c
 	hud.c
 	instance_data.c
