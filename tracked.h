@@ -11,7 +11,7 @@ typedef struct tracked {
 } Tracked;
 
 Tracked* createTracked(int);
-bool addSector(Tracked*, int);
+int addSector(Tracked*, int);
 void resetSectors(Tracked*);
 void freeTracked(Tracked*);
 

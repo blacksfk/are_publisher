@@ -26,15 +26,24 @@ Tracked* createTracked(int sectorCount) {
 }
 
 /**
- * Add a sector time to a tracked object.
+ * Calculate the current sector time from the current lap time.
  * @param  t
- * @param  time
- * @return         True if the lap has been completed and false otherwise.
+ * @param  time The current lap time
+ * @return      True if the lap has been completed and false otherwise.
  */
-bool addSector(Tracked* t, int time) {
+int addSector(Tracked* t, int time) {
+	if (t->currSector >= t->sectorCount) {
+		resetSectors(t);
+	}
+
+	for (int i = 0; i < t->currSector; i++) {
+		// subtract each previous sector from the given lap time
+		time -= t->sectors[i];
+	}
+
 	t->sectors[t->currSector++] = time;
 
-	return t->currSector >= t->sectorCount;
+	return time;
 }
 
 /**
