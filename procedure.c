@@ -1,9 +1,9 @@
 #include "procedure.h"
 
-// groups the url, password header, and curl handler
+// groups the curl handler, header list, and tracked extra data
 struct attributes {
 	CURL* curl;
-	char* pwHeader;
+	Tracked* tracked;
 	struct curl_slist* headers;
 };
 
@@ -11,18 +11,10 @@ struct attributes {
  * Free memory allocated for the url, header, and curl.
  */
 static void freeAttributes(struct attributes a) {
-	free(a.pwHeader);
+	freeTracked(a.tracked);
 	curl_easy_cleanup(a.curl);
 	curl_slist_free_all(a.headers);
 }
-
-/**
- * Free memory allocated for the temporary strings used in initAttributes.
- */
-#define ATTR_CLEANUP(a, b) do {\
-	free(a);\
-	free(b);\
-} while(0)
 
 /**
  * Creates a message queue, URL and header strings, and a curl easy handle.
@@ -34,7 +26,7 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 	// initialise all members to NULL
 	a->curl = NULL;
 	a->headers = NULL;
-	a->pwHeader = NULL;
+	a->tracked = NULL;
 
 	// force initialisation of the message queue
 	MSG msg;
@@ -64,31 +56,46 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 	if (!channel || !password) {
 		// out of memory
 		freeAttributes(*a);
-		ATTR_CLEANUP(channel, password);
+		free(channel);
+		free(password);
 
 		return ARE_OUT_OF_MEM;
 	}
 
 	// create the password header string
-	a->pwHeader = createPasswordHeader(password);
+	char* pwHeader = createPasswordHeader(password);
 
-	if (!a->pwHeader) {
+	// temporary password string no longer required
+	free(password);
+
+	if (!pwHeader) {
 		// out of memory
 		freeAttributes(*a);
-		ATTR_CLEANUP(channel, password);
+		free(channel);
 
 		return ARE_OUT_OF_MEM;
 	}
 
 	// initialise the curl handle with the required parameters
-	a->headers = publishInit(a->curl, API_URL, channel, a->pwHeader);
+	a->headers = publishInit(a->curl, API_URL, channel, pwHeader);
 
 	// temporary strings no longer required
-	ATTR_CLEANUP(channel, password);
+	free(channel);
+	free(pwHeader);
 
 	if (!a->headers) {
 		// out of memory
 		freeAttributes(*a);
+
+		return ARE_OUT_OF_MEM;
+	}
+
+	a->tracked = createTracked(DEFAULT_SECTOR_COUNT);
+
+	if (!a->tracked) {
+		freeAttributes(*a);
+
+		return ARE_OUT_OF_MEM;
 	}
 
 	// signal the event in order for the parent to proceed
@@ -108,59 +115,6 @@ static bool terminate() {
 	PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE);
 
 	return (msg.message == WM_QUIT);
-}
-
-/**
- * Convert the data in the memory maps to a non-formatted JSON
- * string and handle associated errors.
- */
-static char* toJSON(struct memMaps prev, struct memMaps curr) {
-	cJSON* obj = cJSON_CreateObject();
-
-	if (!obj) {
-		return NULL;
-	}
-
-	// convert HUD parameters to a JSON object
-	obj = hudToJSON(obj, curr.hud, prev.hud);
-
-	if (!obj) {
-		// if memory isn't being allocated something is seriously wrong
-		return NULL;
-	}
-
-	// convert physics parameters to a JSON object
-	obj = physicsToJSON(obj, curr.physics, prev.physics);
-
-	if (!obj) {
-		return NULL;
-	}
-
-	// only send props if a change in the properties was detected
-	// i.e. the user changed sessions
-	// the properties don't need to be checked every time because they
-	// are only updated in shared memory if the user changed sessions
-	if (!prev.props) {
-		obj = propertiesToJSON(obj, curr.props);
-
-		if (!obj) {
-			return NULL;
-		}
-	}
-
-	// TODO: determine the most appropriate value for JSON_BUF_SIZE in order
-	// to minimise re-allocations
-	char* str = cJSON_PrintBuffered(obj, JSON_BUF_SIZE, 0);
-
-	if (!str) {
-		return NULL;
-	}
-
-	// json printed; objects are no longer required
-	cJSON_Delete(obj);
-
-	// remember to free the string
-	return str;
 }
 
 /**
@@ -231,15 +185,6 @@ static DWORD push(struct attributes a, char* json) {
 	return 0;
 }
 
-// quick hack to get a complete data set on first run or when
-// the user gets back into the car
-// TODO: refactor to not use this (a better solution required)
-static const struct memMaps nullPrev = {
-	.hud = NULL,
-	.props = NULL,
-	.physics = NULL
-};
-
 /**
  * Main loop. Implements ThreadProc.
  * @param  arg Cast to InstanceData*
@@ -284,20 +229,23 @@ DWORD WINAPI procedure(void* arg) {
 			continue;
 		}
 
+		if (completeData) {
+			// update the track sector count
+			resetSectors(attr.tracked);
+
+			if (!setSectorCount(attr.tracked, data->sm->curr.props->sectorCount)) {
+				// re-allocation failed
+				result = ARE_OUT_OF_MEM;
+				break;
+			}
+		}
+
 		// get a time stamp to measure the length of the process
 		ULONGLONG start = GetTickCount64();
-		char* json = NULL;
+		char* json = deltaJSON(data->sm, attr.tracked, completeData);
 
 		if (completeData) {
-			// get the complete data by passing NULL for the previous
-			// frame
-			json = toJSON(nullPrev, data->sm->curr);
-
-			// only send delta data until the player gets out and then back in
 			completeData = false;
-		} else {
-			// get delta data by passing the previous frame
-			json = toJSON(data->sm->prev, data->sm->curr);
 		}
 
 		if (!json) {
