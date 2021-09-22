@@ -25,6 +25,7 @@ add_executable(
 	auxiliary.c
 	channel.c
 	controls.c
+	delta.c
 	gui.c
 	hud.c
 	instance_data.c
@@ -35,6 +36,7 @@ add_executable(
 	request.c
 	main.c
 	shared_mem.c
+	tracked.c
 )
 target_include_directories(are_publisher PUBLIC ${PROJECT_BINARY_DIR})
 target_link_libraries(are_publisher ${CONAN_LIBS})
