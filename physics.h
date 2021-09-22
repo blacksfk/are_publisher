@@ -239,8 +239,4 @@ typedef struct physics {
 cJSON* physicsToJSON(cJSON*, const Physics*, const Physics*);
 bool physicsIsInCar(const Physics*);
 
-#ifdef DEBUG
-void printPhysics(const Physics*, FILE*);
-#endif
-
 #endif
