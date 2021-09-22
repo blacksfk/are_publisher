@@ -131,6 +131,8 @@ static cJSON* createBrakes(const Physics* curr, const Physics* prev) {
 
 				return NULL;
 			}
+		} else {
+			cJSON_Delete(ptr);
 		}
 	}
 
@@ -322,6 +324,8 @@ cJSON* physicsToJSON(cJSON* obj, const Physics* curr, const Physics* prev) {
 
 				return NULL;
 			}
+		} else {
+			cJSON_Delete(item);
 		}
 	}
 
