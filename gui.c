@@ -131,14 +131,20 @@ static void startProcedure(HWND wnd, InstanceData* data) {
 	);
 
 	if (waitResult == WAIT_FAILED) {
-		msgBoxErr(wnd, ARE_EVENT, L"Waiting for thread initilisation failed");
+		msgBoxErr(wnd, ARE_EVENT, L"Waiting for thread initialisation failed");
 
 		return;
 	}
 
 	if (waitResult - WAIT_OBJECT_0 == 0) {
 		// initialisation error
-		 msgBoxErr(wnd, ARE_THREAD, L"Failed to initialise thread");
+		DWORD exitCode = 0;
+
+		if (!GetExitCodeThread(data->thread, &exitCode)) {
+			msgBoxErr(wnd, ARE_THREAD, L"Failed to initialise thread");
+		} else {
+			msgBoxErr(wnd, (int) exitCode, L"Failed to initialise thread");
+		}
 
 		 return;
 	}
