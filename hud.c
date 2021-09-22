@@ -36,21 +36,13 @@ static cJSON* createLaptimes(const HUD* curr, const HUD* prev) {
 		INT_2_OBJ(obj, "estimated", curr->estimatedLapTime);
 	}
 
-	// only add the previous laptime and sector data if prev is not NULL
+	// only add the previous laptime if prev is not NULL
 	if (prev) {
 		if (curr->completedLaps > prev->completedLaps) {
 			// new lap started
 			// this should never be a bogus value because it is only added when
 			// completedLaps differs (and therefore this should be set appropriately)
 			INT_2_OBJ(obj, "prev", curr->prevLapTime);
-
-			// get the last sector time by subtracting the cumulative sector time from
-			// the previous lap time
-			INT_2_OBJ(obj, "prevSector", curr->prevLapTime - prev->cumulativeSectorTime);
-		} else if (curr->currSectorIndex > prev->currSectorIndex) {
-			// new sector (but same lap)
-			// get the exact previous sector time by subtracting the cumulative time
-			INT_2_OBJ(obj, "prevSector", curr->currLapTime - curr->cumulativeSectorTime);
 		}
 	}
 
@@ -473,6 +465,8 @@ cJSON* hudToJSON(cJSON* obj, const HUD* curr, const HUD* prev) {
 
 				return NULL;
 			}
+		} else {
+			cJSON_Delete(ptr);
 		}
 	}
 
