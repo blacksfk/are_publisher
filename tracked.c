@@ -59,6 +59,25 @@ void resetSectors(Tracked* t) {
 }
 
 /**
+ * Set the number of sectors.
+ * @param  t
+ * @param  sectorCount
+ * @return             False if re-allocation was unsuccessful. True otherwise.
+ */
+bool setSectorCount(Tracked* t, int sectorCount) {
+	int* temp = realloc(t->sectors, sizeof(int) * sectorCount);
+
+	if (!temp) {
+		return false;
+	}
+
+	t->sectors = temp;
+	t->sectorCount = sectorCount;
+
+	return true;
+}
+
+/**
  * Free the memory held by a tracked object.
  * @param t
  */
