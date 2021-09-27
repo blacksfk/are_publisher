@@ -272,8 +272,7 @@ let complete = {
 
 	// brake information
 	brakes: {
-		// this is the raw value; it should be manipulated as described in the
-		// shared memory documentation on a per car basis
+		// expressed in percentage form with the appropriate offset already applied
 		bias: 0.0,
 
 		// brake pad compound
