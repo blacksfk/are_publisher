@@ -17,6 +17,7 @@ struct formHandlers {
 
 	HWND btnRefresh;
 	HWND btnToggle;
+	HWND btnInfo;
 };
 
 typedef struct instanceData {
