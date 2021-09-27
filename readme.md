@@ -13,15 +13,17 @@ Work like a real race engineer on a virtual car! This application simply reads f
 * **DISABLE_BROADCAST**: Prevents the POST request from occurring.
 * **RECORD_DATA**: Saves the JSON data to data.json in a JSON array.
 * **CURL_SKIP_VERIFY**: Skip curl TLS peer verification.
+* **API_URL**: Sets the URL for the remote server.
 
 ## Compiling
 MSVC defaults to building for a debug environment so building for production requires an extra flag. The executable will be available under the `bin` sub-directory in either environment mode.
 
 ### Development
-`cmake --build .`
+1. `cmake .. -D API_URL="http://localhost:6060"`
+2. `cmake --build .`
 
 ### Production
-1. `cmake .. -D DEBUG=OFF -D DISABLE_BROADCAST=OFF -D RECORD_DATA=OFF`
+1. `cmake .. -D DEBUG=OFF -D DISABLE_BROADCAST=OFF -D RECORD_DATA=OFF -D API_URL="https://example.com"`
 2. `cmake --build . --config Release`
 
 ## Broadcast data structure
