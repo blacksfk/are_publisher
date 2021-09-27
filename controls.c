@@ -26,6 +26,21 @@ bool getHandlerText(InstanceData* data) {
  * @return          True if all windows were created and false otherwise.
  */
 bool createControls(HWND parent, struct formHandlers* handlers) {
+	// info button
+	handlers->btnInfo = CreateWindowW(
+		L"Button",
+		L"?",
+		FORM_BTN_STYLE,
+		WINDOW_W - MARGIN_X * 4,
+		WINDOW_H - MARGIN_Y * 7,
+		20,
+		20,
+		parent,
+		(HMENU) BTN_INFO,
+		NULL,
+		NULL
+	);
+
 	// channel label
 	handlers->lblChannel = CreateWindowW(
 		L"Static",
@@ -124,6 +139,7 @@ bool createControls(HWND parent, struct formHandlers* handlers) {
 		handlers->ctrlChannel &&
 		handlers->ctrlPassword &&
 		handlers->btnToggle &&
-		handlers->btnRefresh
+		handlers->btnRefresh &&
+		handlers->btnInfo
 	);
 }

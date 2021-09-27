@@ -5,7 +5,8 @@
 
 enum buttons {
 	BTN_TOGGLE = 1000,
-	BTN_REFRESH
+	BTN_REFRESH,
+	BTN_INFO
 };
 
 #define BTN_START L"Start"
