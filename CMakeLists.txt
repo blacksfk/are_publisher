@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 
+# project name
+project(are_publisher VERSION 0.1.0)
+
 # compile time flags
 option(DEBUG "Enable logging for debugging purposes" ON)
 option(DISABLE_BROADCAST "Disable broadcasting during debugging" OFF)
 option(RECORD_DATA "Record JSON data to data.json" OFF)
 set(API_URL, "" CACHE STRING "API URL")
 configure_file(config.h.in config.h)
-
-# project name
-project(are_publisher)
 
 # compiler options
 add_compile_options(/W4 /WX /std:c17)
