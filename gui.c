@@ -264,14 +264,66 @@ static LRESULT refreshHandler(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 	return 0;
 }
 
+/**
+ * Handle info button clicks.
+ */
+static LRESULT infoHandler(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
+	(void) msg;
+	(void) w;
+	(void) l;
+
+	wchar_t buf[MSG_BOX_BUF_SIZE];
+
+	// construct the message
+	swprintf(buf, MSG_BOX_BUF_SIZE,
+		L"Server URL: %hs\n"
+		L"Sample frequency: %dHz\n"
+		L"Debug mode: %d\n"
+		L"Broadcasting disabled: %d\n"
+		L"Record data: %d\n"
+		L"Curl skip peer verification: %d\n"
+		L"Version: %d.%d.%d\n",
+		API_URL,
+		MAX_LOOP_TIME / 1000,
+	#ifdef DEBUG
+		true,
+	#else
+		false,
+	#endif
+	#ifdef DISABLE_BROADCAST
+		true,
+	#else
+		false,
+	#endif
+	#ifdef RECORD_DATA
+		true,
+	#else
+		false,
+	#endif
+	#ifdef CURL_SKIP_VERIFY
+		true,
+	#else
+		false,
+	#endif
+		ARE_VERSION_MAJOR,
+		ARE_VERSION_MINOR,
+		ARE_VERSION_PATCH);
+
+	// display the message
+	MessageBoxW(wnd, buf, L"Compiled settings", MB_ICONINFORMATION);
+
+	return 0;
+}
+
 struct buttonHandler {
 	WPARAM id;
 	LRESULT (*handler)(HWND, UINT, WPARAM, LPARAM);
 };
 
 static const struct buttonHandler btnHandlers[] = {
-	{BTN_TOGGLE, toggleHandler},
-	{BTN_REFRESH, refreshHandler}
+	{BTN_TOGGLE, &toggleHandler},
+	{BTN_REFRESH, &refreshHandler},
+	{BTN_INFO, &infoHandler}
 };
 
 static const size_t btnHandlersLen = sizeof(btnHandlers) / sizeof(btnHandlers[0]);
