@@ -65,14 +65,18 @@ void resetSectors(Tracked* t) {
  * @return             False if re-allocation was unsuccessful. True otherwise.
  */
 bool setSectorCount(Tracked* t, int sectorCount) {
-	int* temp = realloc(t->sectors, sizeof(int) * sectorCount);
+	int* temp = malloc(sizeof(int) * sectorCount);
 
 	if (!temp) {
 		return false;
 	}
 
+	free(t->sectors);
 	t->sectors = temp;
 	t->sectorCount = sectorCount;
+
+	// reset the sector values
+	resetSectors(t);
 
 	return true;
 }
