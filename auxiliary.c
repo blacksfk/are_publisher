@@ -53,7 +53,7 @@ cJSON* addWstrToObject(cJSON* obj, char* key, const wchar_t* wstr) {
 
 	if (!mbstr) {
 		// out of memory
-		return NULL;
+		RET_NULL(obj);
 	}
 
 	// add the string to the object
