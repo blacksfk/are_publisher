@@ -6,7 +6,6 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#include "api.h"
 #include "controls.h"
 
 #define WINDOW_CLASS L"are_publisher_class"

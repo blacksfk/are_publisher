@@ -195,7 +195,7 @@ static LRESULT toggleHandler(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 static int refreshChannels(InstanceData* data) {
 	// get all channels from the API
 	cJSON* array;
-	int result = getChannelsJSON(&array);
+	int result = getChannels(&array);
 	HWND cb = data->handlers.ctrlChannel;
 
 	if (result != 0) {
