@@ -1,8 +1,8 @@
 #ifndef PROCEDURE_H
 #define PROCEDURE_H
 
+#include "api.h"
 #include "delta.h"
-#include "request.h"
 #include "instance_data.h"
 
 #define SLEEP_DURATION 1000

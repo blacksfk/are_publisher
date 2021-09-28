@@ -118,74 +118,6 @@ static bool terminate() {
 }
 
 /**
- * Push a JSON data packet to the server.
- * @param  a
- * @param  json free'd once sent.
- * @return      Non-zero error code on failure, zero otherwise.
- */
-static DWORD push(struct attributes a, char* json) {
-	// push the JSON string to the server
-	Response* res = publish(a.curl, json);
-
-	// once sent the json string is no longer required
-	free(json);
-
-	if (!res) {
-		// out of memory
-		return ARE_OUT_OF_MEM;
-	}
-
-	// check for a curl error
-	if (res->curlCode != 0) {
-		// programmer error with libcurl (most likely)
-		wchar_t* error = strToWstr(curl_easy_strerror(res->curlCode));
-
-		if (!error) {
-			// out of memory
-			return ARE_OUT_OF_MEM;
-		}
-
-	#ifdef DEBUG
-		fwprintf(stderr, L"Curl: %ls\n", error);
-	#endif
-
-		wprintf(L"%d: %ls\n", ARE_CURL, error);
-		free(error);
-
-		return ARE_CURL;
-	}
-
-	// check for a request or server error
-	if (res->status >= 400) {
-		// something is fundamentally wrong with either:
-		// (a) the request or
-		// (b) the server
-		// in either case it is best to terminate because (a) will
-		// require re-compilation and (b) requires server maintainence
-		wchar_t* error = strToWstr(res->body->data);
-
-		if (!error) {
-			// out of memory
-			return ARE_OUT_OF_MEM;
-		}
-
-	#ifdef DEBUG
-		fwprintf(stderr, L"Status: %d\nBody: %ls\n", res->status, error);
-	#endif
-
-		wprintf(L"%d: %ls\n", ARE_REQ, error);
-		free(error);
-
-		return ARE_REQ;
-	}
-
-	// response no longer required
-	free(res);
-
-	return 0;
-}
-
-/**
  * Main loop. Implements ThreadProc.
  * @param  arg Cast to InstanceData*
  * @return     0 on success, an error code defined in error.h otherwise.
@@ -258,19 +190,19 @@ DWORD WINAPI procedure(void* arg) {
 		fprintf(out, "\t%s,\n", json);
 	#endif
 
-	#ifdef DISABLE_BROADCAST
-		// json no longer required
-		free(json);
-	#else
+	#ifndef DISABLE_BROADCAST
 		printf("broadcasting...\n");
 		// send the json to the server
-		result = push(attr, json);
+		result = publish(attr.curl, json);
 
 		if (result != 0) {
 			// something went wrong with curl or no memory
 			break;
 		}
 	#endif
+
+		// json no longer required
+		free(json);
 
 		// copy the current frame's data to the previous frame
 		sharedMemCurrToPrev(data->sm);
