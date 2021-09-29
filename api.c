@@ -289,6 +289,12 @@ int getChannels(cJSON** ptr) {
 	return 0;
 }
 
+/**
+ * Verify the provided password is correct by "logging in" to a channel.
+ * @param  id Channel ID.
+ * @param  pw The password to test.
+ * @return    Zero on success, non-zero on failure (as described in error.h).
+ */
 int channelLogin(char* id, char* pw) {
 	CURL* curl = curl_easy_init();
 
