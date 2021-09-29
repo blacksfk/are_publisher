@@ -67,13 +67,20 @@ cJSON* addWstrToObject(cJSON* obj, char* key, const wchar_t* wstr) {
 
 /**
  * Show a message box with an error code and static message.
- * @param e   The error code.
- * @param str The error message.
+ * @param parent Parent window.
+ * @param eCode  The error code.
+ * @param str    Specific information detailing why the error occurred.
  */
-void msgBoxErr(HWND parent, int e, const wchar_t* str) {
-	wchar_t msg[MSG_BOX_BUF_SIZE];
+void msgBoxErr(HWND parent, int eCode, const wchar_t* str) {
+	wchar_t buf[MSG_BOX_BUF_SIZE];
+	wchar_t* eMsg = errorToWstr(eCode);
 
-	wprintf(L"%d: %ls\n", e, str);
-	swprintf(msg, MSG_BOX_BUF_SIZE, L"%d: %ls.", e, str);
-	MessageBoxW(parent, msg, L"Error", MB_OK | MB_ICONERROR);
+	// format the buffer
+	swprintf(buf, MSG_BOX_BUF_SIZE, L"%ls (%d): %ls.", eMsg, eCode, str);
+
+	// log to the terminal
+	wprintf(L"%ls\n", buf);
+
+	// display to the user
+	MessageBoxW(parent, buf, L"Error", MB_OK | MB_ICONERROR);
 }
