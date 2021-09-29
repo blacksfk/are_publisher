@@ -26,6 +26,7 @@ add_executable(
 	channel.c
 	controls.c
 	delta.c
+	error.c
 	gui.c
 	hud.c
 	instance_data.c
