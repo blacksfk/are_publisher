@@ -2,7 +2,7 @@
 #define ERROR_H
 
 enum areError {
-	ARE_SHARED_MEM_INIT = -1000,
+	ARE_SHARED_MEM_INIT = 32000,
 	ARE_OUT_OF_MEM,
 	ARE_CURL,
 	ARE_REQ,
