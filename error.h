@@ -1,6 +1,8 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+#include <stddef.h>
+
 enum areError {
 	ARE_SHARED_MEM_INIT = 32000,
 	ARE_OUT_OF_MEM,
@@ -13,5 +15,7 @@ enum areError {
 	ARE_FILE,
 	ARE_EVENT
 };
+
+wchar_t* errorToWstr(enum areError);
 
 #endif
