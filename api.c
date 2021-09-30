@@ -329,15 +329,27 @@ int channelLogin(char* id, char* pw) {
 	free(url);
 
 	// attach the password in a JSON body
-	cJSON* body = cJSON_CreateObject();
+	cJSON* raw = cJSON_CreateObject();
 
-	if (!body) {
+	if (!raw) {
 		curl_easy_cleanup(curl);
 
 		return ARE_OUT_OF_MEM;
 	}
 
-	if (!cJSON_AddStringToObject(body, "password", pw)) {
+	if (!cJSON_AddStringToObject(raw, "password", pw)) {
+		curl_easy_cleanup(curl);
+
+		return ARE_OUT_OF_MEM;
+	}
+
+	// convert to a string
+	char* body = cJSON_Print(raw);
+
+	// no longer need the raw object
+	cJSON_Delete(raw);
+
+	if (!body) {
 		curl_easy_cleanup(curl);
 
 		return ARE_OUT_OF_MEM;
@@ -352,7 +364,7 @@ int channelLogin(char* id, char* pw) {
 
 	if (!headers) {
 		curl_easy_cleanup(curl);
-		cJSON_Delete(body);
+		free(body);
 
 		return ARE_OUT_OF_MEM;
 	}
@@ -363,7 +375,7 @@ int channelLogin(char* id, char* pw) {
 	// no longer need the curl handle, json body, and headers
 	curl_easy_cleanup(curl);
 	curl_slist_free_all(headers);
-	cJSON_Delete(body);
+	free(body);
 
 	if (!res) {
 		return ARE_OUT_OF_MEM;
