@@ -17,6 +17,8 @@ wchar_t* errorToWstr(enum areError e) {
 		return L"Request error";
 	case ARE_REQ_TIMEOUT:
 		return L"Request timed out";
+	case ARE_SERVER:
+		return L"Remote server error";
 	case ARE_GUI:
 		return L"GUI error";
 	case ARE_USER_INPUT:
