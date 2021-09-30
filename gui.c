@@ -76,6 +76,7 @@ static void startProcedure(HWND wnd, InstanceData* data) {
 		return;
 	}
 
+	// copy the id and password into something useable
 	int error = getHandlerText(data);
 
 	if (error != 0) {
