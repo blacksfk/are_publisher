@@ -36,9 +36,11 @@ int addSector(Tracked* t, int time) {
 		resetSectors(t);
 	}
 
-	for (int i = 0; i < t->currSector; i++) {
-		// subtract each previous sector from the given lap time
-		time -= t->sectors[i];
+	if (t->currSector > 0) {
+		for (int i = 0; i < t->currSector; i++) {
+			// subtract each previous sector from the given lap time
+			time -= t->sectors[i];
+		}
 	}
 
 	t->sectors[t->currSector++] = time;
