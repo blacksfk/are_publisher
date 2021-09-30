@@ -342,6 +342,7 @@ int channelLogin(char* id, char* pw) {
 
 	if (!headers) {
 		curl_easy_cleanup(curl);
+		cJSON_Delete(body);
 
 		return ARE_OUT_OF_MEM;
 	}
