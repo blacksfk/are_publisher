@@ -106,6 +106,28 @@ static cJSON* brakeBias(cJSON* parent, SharedMem* sm, bool complete) {
 }
 
 /**
+ * Adds the key "newSession" with the value set to true if the session has changed.
+ * @param  parent
+ * @param  sm
+ */
+static cJSON* newSession(cJSON* parent, SharedMem* sm) {
+	struct memMaps* prev = sm->prev;
+	struct memMaps* curr = sm->curr;
+
+	if (!prev ||
+		// session has changed
+		prev.hud->sessionIndex != curr.hud->sessionIndex ||
+		// track has changed
+		wcscmp(prev.props->track, curr.props->track) != 0 ||
+		// car has changed
+		wcscmp(prev.props->carModel, curr.props->carModel) != 0) {
+		BOOL_2_OBJ(parent, "newSession", true);
+	}
+
+	return parent;
+}
+
+/**
  * Add the previous sector time once the sector has been completed.
  * @param  parent
  * @param  sm
@@ -181,6 +203,7 @@ char* deltaJSON(SharedMem* sm, Tracked* t, bool complete) {
 
 	// custom parameters requiring additional information
 	brakeBias(parent, sm, complete);
+	newSession(parent, sm);
 	parent = prevSector(parent, sm, t);
 
 	if (!parent) {
