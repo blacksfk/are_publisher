@@ -316,7 +316,7 @@ int channelLogin(char* id, char* pw) {
 	commonOptions(curl);
 
 	// create a url string
-	char* url = createURL(4, API_URL, CHAN_ENDPOINT, id, "login");
+	char* url = createURL(3, API_URL, CHAN_ENDPOINT, id);
 
 	if (!url) {
 		curl_easy_cleanup(curl);
