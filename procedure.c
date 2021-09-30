@@ -33,6 +33,17 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 
 	PeekMessageW(&msg, NULL, WM_USER, WM_USER, PM_NOREMOVE);
 
+	// ensure the channel id and password are correct
+	int error = channelLogin(data->channel, data->password);
+
+	if (error != 0) {
+		if (error == ARE_REQ) {
+			return ARE_USER_INPUT;
+		}
+
+		return (DWORD) error;
+	}
+
 	// create a curl easy handle
 	a->curl = curl_easy_init();
 
