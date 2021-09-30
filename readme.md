@@ -37,6 +37,11 @@ let complete = {
 	// > 0
 	position: 0,
 
+	// present when a new session has commenced
+	// caveat: cannot determine when a session is exited and restarted
+	// with the same car, circuit, and session index
+	newSession: false,
+
 	// distance covered in a session (in metres)
 	distanceTraveled: 0.0,
 
