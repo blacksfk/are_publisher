@@ -44,43 +44,20 @@ static DWORD initAttributes(struct attributes* a, InstanceData* data) {
 	curl_easy_setopt(a->curl, CURLOPT_SSL_VERIFYPEER, 0L);
 #endif
 
-#ifdef DEBUG
-	wprintf(L"channel ID: %ls\npassword: %ls\n",
-			data->channel, data->password);
-#endif
-
-	// convert the wide char buffers into char buffers
-	char* channel = wstrToStr(data->channel);
-	char* password = wstrToStr(data->password);
-
-	if (!channel || !password) {
-		// out of memory
-		freeAttributes(*a);
-		free(channel);
-		free(password);
-
-		return ARE_OUT_OF_MEM;
-	}
-
 	// create the password header string
-	char* pwHeader = createPasswordHeader(password);
-
-	// temporary password string no longer required
-	free(password);
+	char* pwHeader = createPasswordHeader(data->password);
 
 	if (!pwHeader) {
 		// out of memory
 		freeAttributes(*a);
-		free(channel);
 
 		return ARE_OUT_OF_MEM;
 	}
 
 	// initialise the curl handle with the required parameters
-	a->headers = publishInit(a->curl, API_URL, channel, pwHeader);
+	a->headers = publishInit(a->curl, API_URL, data->channel, pwHeader);
 
-	// temporary strings no longer required
-	free(channel);
+	// temporary string no longer required
 	free(pwHeader);
 
 	if (!a->headers) {
