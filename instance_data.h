@@ -4,9 +4,6 @@
 #include "channel.h"
 #include "shared_mem.h"
 
-// how much text could you really enter?? 4096 wchar_t characters should be plenty...
-#define FORM_CTRL_BUF_SIZE 8192
-
 // struct that groups the window handlers of the form controls
 struct formHandlers {
 	HWND lblChannel;
@@ -21,12 +18,11 @@ struct formHandlers {
 };
 
 typedef struct instanceData {
-	// pointer to the selected channel's ID
-	// niether allocated nor de-allocated by instance data functions
-	wchar_t* channel;
+	// selected channel's ID copied and converted from the channel list
+	char* channel;
 
-	// text input copied from the password window handler
-	wchar_t* password;
+	// text input copied (and converted) from the password window handler
+	char* password;
 
 	// whether or not the end user has clicked the start button
 	bool running;
