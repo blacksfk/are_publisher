@@ -211,7 +211,11 @@ int publish(CURL* curl, const char* json) {
 	}
 
 	if (status >= 400) {
-		return ARE_REQ;
+		if (status < 500) {
+			return ARE_REQ;
+		}
+
+		return ARE_SERVER;
 	}
 
 	return 0;
@@ -270,9 +274,15 @@ int getChannels(cJSON** ptr) {
 
 	if (res->status >= 400) {
 		// something went wrong with the request
+		int status = res->status;
+
 		freeResponse(res);
 
-		return ARE_REQ;
+		if (status < 500) {
+			return ARE_REQ;
+		}
+
+		return ARE_SERVER;
 	}
 
 	cJSON* array = cJSON_Parse(res->body->data);
@@ -375,7 +385,11 @@ int channelLogin(char* id, char* pw) {
 	}
 
 	if (status >= 400) {
-		return ARE_REQ;
+		if (status < 500) {
+			return ARE_REQ;
+		}
+
+		return ARE_SERVER;
 	}
 
 	return 0;
