@@ -9,6 +9,8 @@ enum buttons {
 	BTN_INFO
 };
 
+#define FORM_CTRL_BUF_SIZE 8192
+
 #define BTN_START L"Start"
 #define BTN_STOP L"Stop"
 
