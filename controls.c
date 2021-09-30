@@ -1,22 +1,61 @@
 #include "controls.h"
 
 /**
- * Copies the bytes from the password input into a useable buffer.
+ * Copies the bytes from the password input into a useable (multibyte string) buffer.
  * @param  data
- * @return      True if all buffers contain at least one byte and false otherwise.
+ * @return      Zero on success, non-zero otherwise (as descirbed in error.h).
  */
-bool getHandlerText(InstanceData* data) {
+int getHandlerText(InstanceData* data) {
+	// free the current pointers
+	free(data->channel);
+	free(data->password);
+
 	// copy the input from the password handle into a useable buffer
 	// GetWindowTextW will truncate and append the the wide null terminator
 	// if the input byte count is > FORM_CTRL_BUF_SIZE - 2
+	wchar_t buf[FORM_CTRL_BUF_SIZE];
 	int p = GetWindowTextW(
 		data->handlers.ctrlPassword,
-		data->password,
+		buf,
 		FORM_CTRL_BUF_SIZE
 	);
 
 	// GetWindowTextW returns the number of characters copied
-	return (p > 0);
+	if (p == 0) {
+		return ARE_USER_INPUT;
+	}
+
+	// convert the password to a multibyte string
+	data->password = wstrToStr(buf);
+
+	if (!data->password) {
+		// out of memory
+		return ARE_OUT_OF_MEM;
+	}
+
+	// find channel name in the channel list
+	ChannelNode* node = data->chanList->head;
+	int idx = (int) SendMessageW(data->handlers.ctrlChannel, CB_GETCURSEL, 0, 0);
+
+	if (idx == CB_ERR) {
+		// no item selected
+		return ARE_USER_INPUT;
+	}
+
+	// advance to the selected channel
+	for (int i = 0; i < idx; i++) {
+		node = node->next;
+	}
+
+	// convert the selected channel's ID to a multibyte string
+	data->channel = wstrToStr(node->chan->id);
+
+	if (!data->channel) {
+		// out of memory
+		return ARE_OUT_OF_MEM;
+	}
+
+	return 0;
 }
 
 /**

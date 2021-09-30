@@ -45,7 +45,7 @@ enum buttons {
 #define FORM_BTN_STYLE (WS_VISIBLE | WS_CHILD | BS_CENTER | WS_GROUP | WS_TABSTOP)
 #define FORM_CTRL_STYLE (WS_VISIBLE | WS_CHILD | WS_BORDER | ES_AUTOHSCROLL | WS_GROUP | WS_TABSTOP)
 
-bool getHandlerText(InstanceData*);
+int getHandlerText(InstanceData*);
 bool createControls(HWND, struct formHandlers*);
 
 #endif

@@ -76,29 +76,17 @@ static void startProcedure(HWND wnd, InstanceData* data) {
 		return;
 	}
 
-	if (!getHandlerText(data)) {
-		msgBoxErr(wnd, ARE_USER_INPUT, L"All fields are required");
+	int error = getHandlerText(data);
+
+	if (error != 0) {
+		if (error == ARE_USER_INPUT) {
+			msgBoxErr(wnd, ARE_USER_INPUT, L"All fields are required");
+		} else {
+			msgBoxErr(wnd, error, L"Error processing input");
+		}
 
 		return;
 	}
-
-	// find channel name in the channel list
-	ChannelNode* node = data->chanList->head;
-	int idx = (int) SendMessageW(data->handlers.ctrlChannel, CB_GETCURSEL, 0, 0);
-
-	if (idx == CB_ERR) {
-		msgBoxErr(wnd, ARE_GUI, L"No item selected in combo box");
-
-		return;
-	}
-
-	// advance to the selected channel
-	for (int i = 0; i < idx; i++) {
-		node = node->next;
-	}
-
-	// set the channel ID
-	data->channel = node->chan->id;
 
 	// create a thread
 	data->thread = CreateThread(
