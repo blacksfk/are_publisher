@@ -572,8 +572,6 @@ void gui(HINSTANCE h, int cmdShow, InstanceData* data) {
 
 	if (result != 0) {
 		msgBoxErr(NULL, result, L"Failed to get channels from API");
-
-		return;
 	}
 
 	// show the window
