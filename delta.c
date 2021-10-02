@@ -157,10 +157,11 @@ static cJSON* prevSector(cJSON* parent, SharedMem* sm, Tracked* t) {
 
 		if (sm->curr.hud->completedLaps > sm->prev.hud->completedLaps) {
 			// new lap started
-			prevSector = addSector(t, sm->curr.hud->prevLapTime);
+			prevSector = addSector(t, sm->prev.hud->currSectorIndex, sm->curr.hud->prevLapTime);
+			resetSectors(t);
 		} else {
 			// same lap, new sector
-			prevSector = addSector(t, sm->curr.hud->currLapTime);
+			prevSector = addSector(t, sm->prev.hud->currSectorIndex, sm->curr.hud->cumulativeSectorTime);
 		}
 
 		INT_2_OBJ(laptimes, "prevSector", prevSector);
