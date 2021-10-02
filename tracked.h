@@ -8,12 +8,11 @@
 
 typedef struct tracked {
 	int* sectors;
-	int currSector;
 	int sectorCount;
 } Tracked;
 
 Tracked* createTracked(int);
-int addSector(Tracked*, int);
+int addSector(Tracked*, int, int);
 void resetSectors(Tracked*);
 bool setSectorCount(Tracked*, int);
 void freeTracked(Tracked*);
