@@ -1,6 +1,7 @@
 #ifndef API_H
 #define API_H
 
+#include <stdio.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <cjson/cJSON.h>

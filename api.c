@@ -207,10 +207,14 @@ int publish(CURL* curl, const char* json) {
 	freeResponse(res);
 
 	if (cc != 0) {
+		printf("Libcurl error: %s (%d)\n", curl_easy_strerror(cc), cc);
+
 		return ARE_CURL;
 	}
 
 	if (status >= 400) {
+		printf("Request error: %d\n", status);
+
 		if (status < 500) {
 			return ARE_REQ;
 		}
@@ -263,6 +267,8 @@ int getChannels(cJSON** ptr) {
 
 	if (cc != CURLE_OK) {
 		freeResponse(res);
+		printf("Libcurl error: %s (%d)\n", curl_easy_strerror(cc), cc);
+
 
 		if (cc == CURLE_OPERATION_TIMEDOUT) {
 			// request took longer than REQ_TIMEOUT
@@ -276,6 +282,7 @@ int getChannels(cJSON** ptr) {
 		// something went wrong with the request
 		int status = res->status;
 
+		printf("Request error: %d\n", status);
 		freeResponse(res);
 
 		if (status < 500) {
@@ -387,6 +394,8 @@ int channelLogin(char* id, char* pw) {
 	freeResponse(res);
 
 	if (cc != 0) {
+		printf("Libcurl error: %s (%d)\n", curl_easy_strerror(cc), cc);
+
 		// curl handling error
 		if (cc == CURLE_OPERATION_TIMEDOUT) {
 			// request timed out
@@ -397,6 +406,8 @@ int channelLogin(char* id, char* pw) {
 	}
 
 	if (status >= 400) {
+		printf("Request error: %d\n", status);
+
 		if (status < 500) {
 			return ARE_REQ;
 		}
