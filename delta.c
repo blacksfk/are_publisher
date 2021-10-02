@@ -134,7 +134,7 @@ static cJSON* newSession(cJSON* parent, SharedMem* sm) {
  */
 static cJSON* prevSector(cJSON* parent, SharedMem* sm, Tracked* t) {
 	// only add the sector time if the indices differ
-	if (sm->prev.hud && sm->curr.hud->currSectorIndex != sm->prev.hud->currSectorIndex) {
+	if (sm->prev.hud->currSectorIndex >= 0 && (sm->curr.hud->currSectorIndex != sm->prev.hud->currSectorIndex)) {
 		cJSON* laptimes = NULL;
 
 		// check if the parent object already has an item under "laptimes"
