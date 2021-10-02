@@ -179,7 +179,6 @@ DWORD WINAPI procedure(void* arg) {
 	#endif
 
 	#ifndef DISABLE_BROADCAST
-		printf("broadcasting...\n");
 		// send the json to the server
 		result = publish(attr.curl, json);
 
