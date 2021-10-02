@@ -273,7 +273,7 @@ static LRESULT infoHandler(HWND wnd, UINT msg, WPARAM w, LPARAM l) {
 		L"Curl skip peer verification: %d\n"
 		L"Version: %d.%d.%d\n",
 		API_URL,
-		MAX_LOOP_TIME / 1000,
+		1000 / MAX_LOOP_TIME,
 	#ifdef DEBUG
 		true,
 	#else
