@@ -111,12 +111,10 @@ static cJSON* brakeBias(cJSON* parent, SharedMem* sm, bool complete) {
  * @param  sm
  */
 static cJSON* newSession(cJSON* parent, SharedMem* sm) {
-	struct memMaps* prev = sm->prev;
-	struct memMaps* curr = sm->curr;
+	struct memMaps prev = sm->prev;
+	struct memMaps curr = sm->curr;
 
-	if (!prev ||
-		// session has changed
-		prev.hud->sessionIndex != curr.hud->sessionIndex ||
+	if (prev.hud->sessionIndex != curr.hud->sessionIndex ||
 		// track has changed
 		wcscmp(prev.props->track, curr.props->track) != 0 ||
 		// car has changed
