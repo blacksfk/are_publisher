@@ -78,6 +78,9 @@ static cJSON* brakeBias(cJSON* parent, SharedMem* sm, bool complete) {
 			}
 		}
 
+		// convert to percentage format
+		bias /= 10;
+
 		// find the car model and offset the bias
 		for (size_t i = 0; i < carOffsetsLen; i++) {
 			if (wcscmp(carOffsets[i].id, sm->curr.props->carModel) == 0) {
@@ -91,7 +94,7 @@ static cJSON* brakeBias(cJSON* parent, SharedMem* sm, bool complete) {
 		char raw[JSON_RAW_FLOAT_WIDTH];
 
 		// format: xy.z
-		snprintf(raw, JSON_RAW_FLOAT_WIDTH, "%.2f", bias / 10);
+		snprintf(raw, JSON_RAW_FLOAT_WIDTH, "%.1f", bias);
 
 		// add to the object
 		if (!cJSON_AddRawToObject(brakes, "bias", raw)) {
