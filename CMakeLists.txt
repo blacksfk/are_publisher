@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # project name
-project(are_publisher VERSION 0.1.2)
+project(are_publisher VERSION 0.1.3)
 
 # compile time flags
 option(DEBUG "Enable logging for debugging purposes" ON)
