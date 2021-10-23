@@ -83,6 +83,7 @@ static cJSON* brakeBias(cJSON* parent, SharedMem* sm, bool complete) {
 			if (wcscmp(carOffsets[i].id, sm->curr.props->carModel) == 0) {
 				// add the (usually negative) offset
 				bias += carOffsets[i].offset;
+				break;
 			}
 		}
 
