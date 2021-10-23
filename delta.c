@@ -58,7 +58,7 @@ size_t carOffsetsLen = sizeof(carOffsets) / sizeof(struct carOffset);
 static cJSON* brakeBias(cJSON* parent, SharedMem* sm, bool complete) {
 	float bias = truncf(sm->curr.physics->brakeBias * 1000);
 	
-	if (complete || truncf(sm->curr.physics->brakeBias) != bias) {
+	if (complete || truncf(sm->prev.physics->brakeBias * 1000) != bias) {
 		cJSON* brakes = NULL;
 
 		// check if the parent object already has an item under "brakes"
